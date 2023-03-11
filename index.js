@@ -9,7 +9,7 @@ async function run() {
 
     const filesPaths = topicTagger(startPoint)
 
-    core.debug(filesPaths); // debug is only output if you set the secret `ACTIONS_RUNNER_DEBUG` to true
+    core.debug(JSON.stringify(filesPaths)); // debug is only output if you set the secret `ACTIONS_RUNNER_DEBUG` to true
 
     const _tags = filesPaths.map(file => file.tokenTags)
 
