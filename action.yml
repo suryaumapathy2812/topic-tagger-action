@@ -1,13 +1,13 @@
-name: 'Wait'
-description: 'Wait a designated number of milliseconds'
+name: "Topic Tagger"
+description: "This Topic Tagger is used to list the topic the user has used in his project"
 inputs:
-  milliseconds:  # id of input
-    description: 'number of milliseconds to wait'
+  start-point:
+    description: "enter the starting point"
     required: true
-    default: '1000'
+    default: "./"
 outputs:
-  time: # output will be available to future steps
-    description: 'The current time after waiting'
+  tags: # output will be available to future steps
+    description: "list of topic used in this project"
 runs:
-  using: 'node16'
-  main: 'dist/index.js'
+  using: "node16"
+  main: "dist/index.js"
