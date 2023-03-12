@@ -197,7 +197,7 @@ const executeScript = function (dir) {
 
         const filesPaths = readCodebase(dir);
 
-        core.info(filesPaths);
+        core.info(JSON.stringify(filesPaths));
 
         filesPaths
             .forEach(
