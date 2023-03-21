@@ -9954,7 +9954,23 @@ const topics = {
 }
 
 function readCodebase(directory) {
-    const files = fs.readdirSync(directory);
+    const files = fs.readdirSync(directory)
+        .filter(file => {
+
+            if (
+                file.startsWith('.') ||
+                file === 'node_modules' ||
+                file.includes(".config") ||
+                file.includes(".min.js") ||
+                file.includes(".test.js")
+            ) {
+                return false;
+            } else {
+                return true
+            }
+
+        });
+
 
     const filesPaths = []
 
@@ -10178,7 +10194,22 @@ const topics = {
 
 // Find all .js files and returns their path
 function readCodebase(directory) {
-    const files = fs.readdirSync(directory);
+    const files = fs.readdirSync(directory)
+        .filter(file => {
+
+            if (
+                file.startsWith('.') ||
+                file === 'node_modules' ||
+                file.includes(".config") ||
+                file.includes(".min.js") ||
+                file.includes(".test.js")
+            ) {
+                return false;
+            } else {
+                return true
+            }
+
+        });
 
     const filePaths = []
 
@@ -10186,9 +10217,7 @@ function readCodebase(directory) {
         const filePath = directory + '/' + file;
         const stats = fs.statSync(filePath);
 
-        if (file.startsWith('.') || file.includes(".config") || file === 'node_modules') {
-            return;
-        }
+
 
         if (stats.isFile() && file.endsWith('.js')) {
             filePaths.push({ path: filePath })

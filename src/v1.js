@@ -69,7 +69,23 @@ const topics = {
 }
 
 function readCodebase(directory) {
-    const files = fs.readdirSync(directory);
+    const files = fs.readdirSync(directory)
+        .filter(file => {
+
+            if (
+                file.startsWith('.') ||
+                file === 'node_modules' ||
+                file.includes(".config") ||
+                file.includes(".min.js") ||
+                file.includes(".test.js")
+            ) {
+                return false;
+            } else {
+                return true
+            }
+
+        });
+
 
     const filesPaths = []
 
