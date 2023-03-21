@@ -10305,10 +10305,6 @@ const executeScript = function (dir) {
     }
 }
 
-console.log(
-    executeScript(".")
-)
-
 module.exports = executeScript 
 
 /***/ }),
