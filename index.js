@@ -7,11 +7,27 @@ async function run() {
     const startPoint = core.getInput('start-point');
     core.info(`Starting point will be  ${startPoint}`);
 
-    const filesPaths = topicTagger(startPoint)
+    const version = core.getInput('version');
+    core.info(`The version will be using is: ${version}`);
 
-    core.debug(JSON.stringify(filesPaths)); // debug is only output if you set the secret `ACTIONS_RUNNER_DEBUG` to true
+    let filePaths;
 
-    const _tags = filesPaths.map(file => file.tokenTags)
+    switch (version) {
+      case "v1":
+        filePaths = topicTagger.v1(startPoint);
+        break;
+      case "v2":
+        filePaths = topicTagger.v2(startPoint);
+        break;
+      default:
+        filePaths = topicTagger.v2(startPoint);
+        break;
+    }
+
+
+    core.debug(JSON.stringify(filePaths)); // debug is only output if you set the secret `ACTIONS_RUNNER_DEBUG` to true
+
+    const _tags = filePaths.map(file => file.topics)
 
     const tags = [...new Set(_tags.flat())]
 
