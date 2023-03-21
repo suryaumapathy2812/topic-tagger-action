@@ -68,13 +68,14 @@ function readCodebase(directory) {
         const filePath = directory + '/' + file;
         const stats = fs.statSync(filePath);
 
+        if (file.startsWith('.') || file.includes(".config") || file === 'node_modules') {
+            return;
+        }
+
         if (stats.isFile() && file.endsWith('.js')) {
-
             filePaths.push({ path: filePath })
-            // tagTopics(filePath);
-
         } else if (stats.isDirectory()) {
-            readCodebase(filePath);
+            filePaths.push(...readCodebase(filePath));
         }
     });
 
@@ -95,7 +96,6 @@ function generateAbstractSyntaxTree(filePath) {
     const ast = espree.parse(code, { ecmaVersion: "latest" });
     return [ast, token];
 }
-
 
 function traverseAST(ast) {
 
@@ -150,7 +150,7 @@ function traverseAST(ast) {
 const executeScript = function (dir) {
     try {
 
-        const filePaths = readCodebase(dir);
+        const filePaths = readCodebase(dir).flat();
 
         core.info("** File Paths are \n")
         filePaths.forEach(file => core.info(JSON.stringify(file)))
