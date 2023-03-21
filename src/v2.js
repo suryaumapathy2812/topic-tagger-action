@@ -158,13 +158,13 @@ const executeScript = function (dir) {
         filePaths
             .forEach(
                 (file, index) => {
-                    const [ast, token] = generateAbstractSyntaxTree(file.path)
-
+                    const tree = generateAbstractSyntaxTree(file.path)
+                    const ast = tree[0];
                     const traversResult = traverseAST(ast);
 
                     const Implementedtopics = Object.entries(traversResult)
-                        .filter(([key, value]) => (value.matches > 0) ? true : false)
-                        .map(([key, value]) => key)
+                        .filter((obj) => (obj[1].matches > 0) ? true : false)
+                        .map((obj) => obj[0])
 
                     console.log(`Topics Implemented in ${file.path} are : \n`, Implementedtopics);
 
