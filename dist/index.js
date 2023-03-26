@@ -10136,6 +10136,7 @@ const core = __nccwpck_require__(186);
 const fs = __nccwpck_require__(147);
 const espree = __nccwpck_require__(910);
 const estraverse = __nccwpck_require__(479);
+const { resolve } = __nccwpck_require__(17);
 
 const topics = {
     "variables": {
@@ -10217,7 +10218,8 @@ function readCodebase(directory) {
         const filePath = directory + '/' + file;
         const stats = fs.statSync(filePath);
 
-
+        const absolutePath = resolve(file);
+        core.debug(absolutePath);
 
         if (stats.isFile() && file.endsWith('.js')) {
             filePaths.push({ path: filePath })

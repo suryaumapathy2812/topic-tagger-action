@@ -1,8 +1,8 @@
 name: "Topic Tagger"
 description: "This Topic Tagger is used to list the topic the user has used in his project"
 branding:
-  icon: 'at-sign'
-  color: 'gray-dark'
+  icon: "at-sign"
+  color: "gray-dark"
 inputs:
   start-point:
     description: "enter the starting point"

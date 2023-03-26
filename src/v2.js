@@ -2,6 +2,7 @@ const core = require('@actions/core');
 const fs = require('fs');
 const espree = require("espree");
 const estraverse = require('estraverse');
+const { resolve } = require('path');
 
 const topics = {
     "variables": {
@@ -83,7 +84,8 @@ function readCodebase(directory) {
         const filePath = directory + '/' + file;
         const stats = fs.statSync(filePath);
 
-
+        const absolutePath = resolve(file);
+        core.debug(absolutePath);
 
         if (stats.isFile() && file.endsWith('.js')) {
             filePaths.push({ path: filePath })
