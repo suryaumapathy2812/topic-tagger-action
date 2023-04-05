@@ -5,6 +5,9 @@
         "jest": true,
         "node": true
     },
+    "plugins": [
+        "unicorn"
+    ],
     "extends": "eslint:recommended",
     "globals": {
         "Atomics": "readonly",
@@ -14,5 +17,29 @@
         "ecmaVersion": 2018
     },
     "rules": {
+        "unicorn/catch-error-name": [
+            "error",
+            {
+                "name": "error"
+            }
+        ],
+        "unicorn/prevent-abbreviations": [
+            "error",
+            {
+                "replacements": {
+                    // Customize variable naming rules here
+                    "e": {
+                        "error": true
+                    }
+                }
+            }
+        ],
+        "camelcase": [
+            "error",
+            {
+                "properties": "always",
+                "ignoreDestructuring": false
+            }
+        ]
     }
 }

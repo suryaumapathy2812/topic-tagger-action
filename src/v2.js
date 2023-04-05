@@ -162,10 +162,10 @@ function traverseAST(ast) {
 
 }
 
-const executeScript = function (dir) {
+const executeScript = function (dirctory) {
     try {
 
-        const filePaths = readCodebase(dir).flat();
+        const filePaths = readCodebase(dirctory).flat();
 
         core.info("** File Paths are \n")
         filePaths.forEach(file => core.info(JSON.stringify(file)))
@@ -178,8 +178,8 @@ const executeScript = function (dir) {
                     const traversResult = traverseAST(ast);
 
                     const Implementedtopics = Object.entries(traversResult)
-                        .filter((obj) => (obj[1].matches > 0) ? true : false)
-                        .map((obj) => obj[0])
+                        .filter((object) => (object[1].matches > 0) ? true : false)
+                        .map((object) => object[0])
 
                     console.log(`Topics Implemented in ${file.path} are : \n`, Implementedtopics);
 

@@ -10093,10 +10093,10 @@ function tagTokenTopic(tokens) {
 
 }
 
-const executeScript = function (dir) {
+const executeScript = function (directory) {
     try {
 
-        const filesPaths = readCodebase(dir);
+        const filesPaths = readCodebase(directory);
 
         core.info(JSON.stringify(filesPaths));
 
@@ -10296,10 +10296,10 @@ function traverseAST(ast) {
 
 }
 
-const executeScript = function (dir) {
+const executeScript = function (dirctory) {
     try {
 
-        const filePaths = readCodebase(dir).flat();
+        const filePaths = readCodebase(dirctory).flat();
 
         core.info("** File Paths are \n")
         filePaths.forEach(file => core.info(JSON.stringify(file)))
@@ -10312,8 +10312,8 @@ const executeScript = function (dir) {
                     const traversResult = traverseAST(ast);
 
                     const Implementedtopics = Object.entries(traversResult)
-                        .filter((obj) => (obj[1].matches > 0) ? true : false)
-                        .map((obj) => obj[0])
+                        .filter((object) => (object[1].matches > 0) ? true : false)
+                        .map((object) => object[0])
 
                     console.log(`Topics Implemented in ${file.path} are : \n`, Implementedtopics);
 
@@ -10444,14 +10444,6 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
  * @type {VisitorKeys}
  */
 const KEYS = {
-    AssignmentExpression: [
-        "left",
-        "right"
-    ],
-    AssignmentPattern: [
-        "left",
-        "right"
-    ],
     ArrayExpression: [
         "elements"
     ],
@@ -10462,15 +10454,23 @@ const KEYS = {
         "params",
         "body"
     ],
+    AssignmentExpression: [
+        "left",
+        "right"
+    ],
+    AssignmentPattern: [
+        "left",
+        "right"
+    ],
     AwaitExpression: [
         "argument"
-    ],
-    BlockStatement: [
-        "body"
     ],
     BinaryExpression: [
         "left",
         "right"
+    ],
+    BlockStatement: [
+        "body"
     ],
     BreakStatement: [
         "label"
@@ -10513,6 +10513,12 @@ const KEYS = {
         "test"
     ],
     EmptyStatement: [],
+    ExperimentalRestProperty: [
+        "argument"
+    ],
+    ExperimentalSpreadProperty: [
+        "argument"
+    ],
     ExportAllDeclaration: [
         "exported",
         "source"
@@ -10532,18 +10538,6 @@ const KEYS = {
     ExpressionStatement: [
         "expression"
     ],
-    ExperimentalRestProperty: [
-        "argument"
-    ],
-    ExperimentalSpreadProperty: [
-        "argument"
-    ],
-    ForStatement: [
-        "init",
-        "test",
-        "update",
-        "body"
-    ],
     ForInStatement: [
         "left",
         "right",
@@ -10552,6 +10546,12 @@ const KEYS = {
     ForOfStatement: [
         "left",
         "right",
+        "body"
+    ],
+    ForStatement: [
+        "init",
+        "test",
+        "update",
         "body"
     ],
     FunctionDeclaration: [
@@ -10594,6 +10594,7 @@ const KEYS = {
     JSXClosingElement: [
         "name"
     ],
+    JSXClosingFragment: [],
     JSXElement: [
         "openingElement",
         "children",
@@ -10602,6 +10603,11 @@ const KEYS = {
     JSXEmptyExpression: [],
     JSXExpressionContainer: [
         "expression"
+    ],
+    JSXFragment: [
+        "openingFragment",
+        "children",
+        "closingFragment"
     ],
     JSXIdentifier: [],
     JSXMemberExpression: [
@@ -10616,22 +10622,19 @@ const KEYS = {
         "name",
         "attributes"
     ],
+    JSXOpeningFragment: [],
     JSXSpreadAttribute: [
         "argument"
     ],
-    JSXText: [],
-    JSXFragment: [
-        "openingFragment",
-        "children",
-        "closingFragment"
+    JSXSpreadChild: [
+        "expression"
     ],
-    JSXClosingFragment: [],
-    JSXOpeningFragment: [],
-    Literal: [],
+    JSXText: [],
     LabeledStatement: [
         "label",
         "body"
     ],
+    Literal: [],
     LogicalExpression: [
         "left",
         "right"
@@ -10686,13 +10689,13 @@ const KEYS = {
         "body"
     ],
     Super: [],
-    SwitchStatement: [
-        "discriminant",
-        "cases"
-    ],
     SwitchCase: [
         "test",
         "consequent"
+    ],
+    SwitchStatement: [
+        "discriminant",
+        "cases"
     ],
     TaggedTemplateExpression: [
         "tag",
@@ -10813,7 +10816,6 @@ function unionWith(additionalKeys) {
 exports.KEYS = KEYS;
 exports.getKeys = getKeys;
 exports.unionWith = unionWith;
-//# sourceMappingURL=eslint-visitor-keys.cjs.map
 
 
 /***/ }),
@@ -11584,7 +11586,7 @@ var espree = () => Parser => {
     };
 };
 
-const version$1 = "9.5.0";
+const version$1 = "9.5.1";
 
 /**
  * @fileoverview Main Espree file that converts Acorn into Esprima output.
@@ -11761,7 +11763,6 @@ exports.parse = parse;
 exports.supportedEcmaVersions = supportedEcmaVersions;
 exports.tokenize = tokenize;
 exports.version = version;
-//# sourceMappingURL=espree.cjs.map
 
 
 /***/ })

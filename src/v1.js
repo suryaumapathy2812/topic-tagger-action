@@ -208,10 +208,10 @@ function tagTokenTopic(tokens) {
 
 }
 
-const executeScript = function (dir) {
+const executeScript = function (directory) {
     try {
 
-        const filesPaths = readCodebase(dir);
+        const filesPaths = readCodebase(directory);
 
         core.info(JSON.stringify(filesPaths));
 
