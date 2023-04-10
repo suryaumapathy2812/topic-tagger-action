@@ -19,6 +19,9 @@ async function run() {
       case "v2":
         filePaths = topicTagger.v2(startPoint);
         break;
+      case "v3":
+        filePaths = topicTagger.v3(startPoint);
+        break;
       default:
         filePaths = topicTagger.v2(startPoint);
         break;
