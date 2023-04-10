@@ -179,7 +179,7 @@ const executeScript = function (dirctory) {
 
                     const Implementedtopics = Object.entries(traversResult)
                         .filter((object) => (object[1].matches > 0) ? true : false)
-                        .map((object) => object[0])
+                        .map((object) => ({ topic: object[0], count: object[1].matches }))
 
                     console.log(`Topics Implemented in ${file.path} are : \n`, Implementedtopics);
 
