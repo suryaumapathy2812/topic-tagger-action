@@ -1,13 +1,17 @@
 name: "Topic Tagger"
 description: "This Topic Tagger is used to list the topic the user has used in his project"
 branding:
-  icon: 'at-sign'
-  color: 'gray-dark'
+  icon: "at-sign"
+  color: "gray-dark"
 inputs:
   start-point:
     description: "enter the starting point"
     required: true
     default: "./"
+  version:
+    description: "Enter the version you want to use. Options v1 / v2"
+    required: true
+    default: "v2"
 outputs:
   tags: # output will be available to future steps
     description: "list of topic used in this project"
