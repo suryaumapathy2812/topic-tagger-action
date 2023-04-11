@@ -1,3 +1,4 @@
+/* eslint-disable no-prototype-builtins */
 const core = require('@actions/core');
 const fs = require('fs');
 const espree = require("espree");
@@ -59,6 +60,9 @@ const topics = {
     },
 };
 
+const extractedCode = {};
+
+
 
 // Find all .js files and returns their path
 function readCodebase(directory) {
@@ -87,10 +91,10 @@ function readCodebase(directory) {
             const absolutePath = resolve(file);
             core.debug(absolutePath);
 
-            if (stats.isFile() && file.endsWith('.js')) {
+            if (stats.isDirectory()) return readCodebase(filePath)
+
+            if (stats.isFile() && (file.endsWith('.js') || stats.endsWith(".html"))) {
                 return { path: filePath }
-            } else if (stats.isDirectory()) {
-                return readCodebase(filePath);
             }
         })
         .filter(entry => entry);
@@ -116,13 +120,14 @@ function extractJsFromHtml(filePath) {
 
 function generateAbstractSyntaxTree(code) {
     const token = espree.tokenize(code, { ecmaVersion: "latest" }).filter(_token => _token.type !== 'Punctuator');
-    const ast = espree.parse(code, { ecmaVersion: "latest" });
+    const ast = espree.parse(code, { ecmaVersion: "latest", loc: true });
     return [ast, token];
 }
 
-function traverseAST(ast) {
+function traverseAST(ast, code) {
 
     const results = {};
+
 
     // Initialize results object
     for (const topic in topics) {
@@ -134,6 +139,12 @@ function traverseAST(ast) {
 
     estraverse.traverse(ast, {
         enter: function (node) {
+
+            if (extractedCode.hasOwnProperty(node.type)) {
+                const snippet = code.substring(node.start, node.end);
+                extractedCode[node.type].push(snippet);
+            }
+
             for (const topic in topics) {
                 if (topics[topic].types.includes(node.type)) {
                     let isMatch = true;
@@ -172,11 +183,20 @@ function traverseAST(ast) {
 
 const executeScript = function (dirctory) {
     try {
+        console.log("Using V3 of topic tagging");
 
         const filePaths = readCodebase(dirctory).flat();
 
-        core.info("** File Paths are \n\n")
-        filePaths.forEach(file => core.info(JSON.stringify(file)))
+        core.info("** File Paths are \n",
+            filePaths.map(file => JSON.stringify(file))
+        )
+
+
+        for (const topic in topics) {
+            topics[topic].types.forEach((type) => {
+                extractedCode[type] = [];
+            });
+        }
 
         filePaths
             .forEach(
@@ -186,23 +206,26 @@ const executeScript = function (dirctory) {
 
                     if (file.endsWith('.html')) {
                         code = extractJsFromHtml(file).join(" \n\n ");
-                        console.log(`JavaScript code in ${file}:\n`, code);
+                        core.debug(`JavaScript code in ${file}:\n`, code);
                     } else if (file.endsWith('.js')) {
                         code = fs.readFileSync(file.path, 'utf8');
                     }
 
                     const tree = generateAbstractSyntaxTree(code)
                     const ast = tree[0];
-                    const traversResult = traverseAST(ast);
+                    const traversResult = traverseAST(ast, code);
 
                     const Implementedtopics = Object.entries(traversResult)
                         .filter((object) => (object[1].matches > 0) ? true : false)
                         .map((object) => ({ topic: object[0], count: object[1].matches }))
 
-                    console.log(`Topics Implemented in ${file.path} are : \n`, Implementedtopics);
+                    core.info(`Topics Implemented in ${file.path} are : \n`, Implementedtopics);
 
                     filePaths[index]["topics"] = Implementedtopics
                 })
+
+
+        core.info("extractedCode \n ", extractedCode)
 
         return filePaths
 
