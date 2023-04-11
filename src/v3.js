@@ -63,15 +63,16 @@ const topics = {
 const extractedCode = {};
 
 
-
 // Find all .js files and returns their path
 function readCodebase(directory) {
+    console.log(fs.readdirSync(directory))
     const entries = fs.readdirSync(directory, { withFileTypes: true })
-        .filter(file => {
+        .filter(({ name: file }) => {
 
             if (
                 file.startsWith('.') ||
                 file === 'node_modules' ||
+                file === 'dist' ||
                 file.includes(".config") ||
                 file.includes(".min.js") ||
                 file.includes(".test.js")
@@ -84,7 +85,7 @@ function readCodebase(directory) {
         });
 
     const filePaths = entries
-        .map(file => {
+        .map(({ name: file }) => {
             const filePath = directory + '/' + file;
             const stats = fs.statSync(filePath);
 
@@ -93,7 +94,7 @@ function readCodebase(directory) {
 
             if (stats.isDirectory()) return readCodebase(filePath)
 
-            if (stats.isFile() && (file.endsWith('.js') || stats.endsWith(".html"))) {
+            if (stats.isFile() && (file.endsWith('.js') || file.endsWith(".html"))) {
                 return { path: filePath }
             }
         })
@@ -127,8 +128,7 @@ function generateAbstractSyntaxTree(code) {
 function traverseAST(ast, code) {
 
     const results = {};
-
-
+    
     // Initialize results object
     for (const topic in topics) {
         results[topic] = {
@@ -142,7 +142,7 @@ function traverseAST(ast, code) {
 
             if (extractedCode.hasOwnProperty(node.type)) {
                 const snippet = code.substring(node.start, node.end);
-                extractedCode[node.type].push(snippet);
+                extractedCode[node.type].push(snippet.replace(/[\n\r\s]+/g, ' '));
             }
 
             for (const topic in topics) {
@@ -187,9 +187,8 @@ const executeScript = function (dirctory) {
 
         const filePaths = readCodebase(dirctory).flat();
 
-        core.info("** File Paths are \n",
-            filePaths.map(file => JSON.stringify(file))
-        )
+        core.info("** File Paths are \n")
+        core.info(filePaths.map(file => JSON.stringify(file)))
 
 
         for (const topic in topics) {
@@ -204,11 +203,12 @@ const executeScript = function (dirctory) {
 
                     let code = ''
 
-                    if (file.endsWith('.html')) {
+                    if ((file.path).endsWith('.html')) {
                         code = extractJsFromHtml(file).join(" \n\n ");
                         core.debug(`JavaScript code in ${file}:\n`, code);
-                    } else if (file.endsWith('.js')) {
-                        code = fs.readFileSync(file.path, 'utf8');
+                    } else if ((file.path).endsWith('.js')) {
+                        const _code = fs.readFileSync(file.path, 'utf8');
+                        code = _code;
                     }
 
                     const tree = generateAbstractSyntaxTree(code)
@@ -219,13 +219,22 @@ const executeScript = function (dirctory) {
                         .filter((object) => (object[1].matches > 0) ? true : false)
                         .map((object) => ({ topic: object[0], count: object[1].matches }))
 
-                    core.info(`Topics Implemented in ${file.path} are : \n`, Implementedtopics);
+                    core.info(`\n\n Topics Implemented in ${file.path} are : \n`);
+                    core.info(`${JSON.stringify(Implementedtopics)} \n\n`);
 
                     filePaths[index]["topics"] = Implementedtopics
                 })
 
 
-        core.info("extractedCode \n ", extractedCode)
+        core.info("extractedCode \n ")
+        core.info(extractedCode)
+
+        const dataset = Object.entries(extractedCode)
+            .map(([key, value]) => {
+                return value.map(_value => ({ code: _value, labels: [key] }))
+            }).flat()
+
+        core.info(dataset)
 
         return filePaths
 
@@ -237,5 +246,7 @@ const executeScript = function (dirctory) {
 
     }
 }
+
+executeScript("./")
 
 module.exports = executeScript 
