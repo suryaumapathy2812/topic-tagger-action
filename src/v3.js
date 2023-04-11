@@ -62,7 +62,19 @@ const topics = {
 
 const extractedCode = {};
 
+function getTopic(type) {
 
+    let topic;
+
+    for (const [key, value] of Object.entries(topics)) {
+        if (value.types.includes(type)) {
+            topic = key;
+            break;
+        }
+    }
+
+    return topic;
+}
 // Find all .js files and returns their path
 function readCodebase(directory) {
     console.log(fs.readdirSync(directory))
@@ -231,7 +243,10 @@ const executeScript = function (dirctory) {
 
         const dataset = Object.entries(extractedCode)
             .map(([key, value]) => {
-                return value.map(_value => ({ code: _value, labels: [key] }))
+                return value.map(_value => {
+                    const topic = getTopic(key);
+                    return { code: _value, labels: { topic: [topic], type: [key] } }
+                })
             }).flat()
 
         core.debug("extractedCode \n ")
@@ -247,7 +262,5 @@ const executeScript = function (dirctory) {
 
     }
 }
-
-executeScript("./")
 
 module.exports = executeScript 
