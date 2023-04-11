@@ -128,7 +128,7 @@ function generateAbstractSyntaxTree(code) {
 function traverseAST(ast, code) {
 
     const results = {};
-    
+
     // Initialize results object
     for (const topic in topics) {
         results[topic] = {
@@ -226,15 +226,16 @@ const executeScript = function (dirctory) {
                 })
 
 
-        core.info("extractedCode \n ")
-        core.info(extractedCode)
+        core.debug("extractedCode \n ")
+        core.debug(JSON.stringify(extractedCode))
 
         const dataset = Object.entries(extractedCode)
             .map(([key, value]) => {
                 return value.map(_value => ({ code: _value, labels: [key] }))
             }).flat()
 
-        core.info(dataset)
+        core.debug("extractedCode \n ")
+        core.debug(JSON.stringify(dataset))
 
         return filePaths
 
