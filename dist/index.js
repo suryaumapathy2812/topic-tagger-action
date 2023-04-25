@@ -33276,7 +33276,7 @@ function extractJsFromHtml(filePath) {
 const executionScript = (directory) => {
     try {
 
-        console.log("Using V3 of topic tagging");
+        console.log("Using V4 of topic tagging");
 
         const filePaths = readCodebase(directory).flat();
 
@@ -33296,7 +33296,6 @@ const executionScript = (directory) => {
             }
 
             const codeChunks = extractCodeChunks(code);
-            console.log(codeChunks);
             const analysisResults = codeChunks.map((chunk) => {
                 const ast = generateAST(chunk);
                 const concepts = ast ? analyzeAST(ast, conceptPatterns) : [];
@@ -33313,7 +33312,13 @@ const executionScript = (directory) => {
 
         })
 
-        console.log(JSON.stringify(filePaths.map(path => path.topics), null, 2))
+
+        const implementations = filePaths.map(path => path.topics)
+        const temporary = implementations
+            .reduce((accumulator, currentObject) => mergeDeep(accumulator, currentObject), {});
+
+        console.log('Implemented Topics are: \n')
+        console.log(JSON.stringify(temporary, null, 2))
         return filePaths
 
     } catch (error) {
