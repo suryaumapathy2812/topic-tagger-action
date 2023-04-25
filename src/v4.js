@@ -1,7 +1,6 @@
 const esprima = require('esprima'); // If using Node.js and npm
 const fs = require('fs');
 const parser = require('@babel/parser');
-const { resolve } = require('path');
 const traverse = require('@babel/traverse').default;
 const cheerio = require("cheerio");
 
@@ -442,7 +441,6 @@ function isObject(item) {
 }
 
 function readCodebase(directory) {
-    console.log(fs.readdirSync(directory))
     const entries = fs.readdirSync(directory, { withFileTypes: true })
         .filter(({ name: file }) => {
 
@@ -465,9 +463,6 @@ function readCodebase(directory) {
         .map(({ name: file }) => {
             const filePath = directory + '/' + file;
             const stats = fs.statSync(filePath);
-
-            const absolutePath = resolve(file);
-            console.debug(absolutePath);
 
             if (stats.isDirectory()) return readCodebase(filePath)
 
@@ -509,7 +504,7 @@ const executionScript = (directory) => {
         console.info(filePaths.map(file => JSON.stringify(file)))
 
 
-        filePaths.map((file, index) => {
+        const implementations = filePaths.map((file, index) => {
             let code = ''
 
             if ((file.path).endsWith('.html')) {
@@ -527,7 +522,6 @@ const executionScript = (directory) => {
                 return { chunk, concepts };
             });
 
-            // const tmp = analysisResults.map((_a) => (_a.concepts)).flat();
             const temporary = analysisResults
                 .reduce((accumulator, currentObject) => mergeDeep(accumulator, currentObject), {});
 
@@ -535,10 +529,9 @@ const executionScript = (directory) => {
 
             filePaths[index]["topics"] = finalResult
 
+            return finalResult;
         })
 
-
-        const implementations = filePaths.map(path => path.topics)
         const consolidatedData = implementations
             .reduce((accumulator, currentObject) => mergeDeep(accumulator, currentObject), {});
 
@@ -550,5 +543,7 @@ const executionScript = (directory) => {
         console.error(error);
     }
 }
+
+executionScript("./src")
 
 module.exports = executionScript
