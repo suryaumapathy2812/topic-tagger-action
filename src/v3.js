@@ -116,7 +116,7 @@ function readCodebase(directory) {
 }
 
 function extractJsFromHtml(filePath) {
-    const htmlContent = fs.readFileSync(filePath, 'utf8');
+    const htmlContent = fs.readFileSync(filePath.path, 'utf8');
     const $ = cheerio.load(htmlContent);
     const scriptTags = $('script');
 

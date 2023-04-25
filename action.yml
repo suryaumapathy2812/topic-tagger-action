@@ -9,7 +9,7 @@ inputs:
     required: true
     default: "./"
   version:
-    description: "Enter the version you want to use. Options v1 / v2"
+    description: "Enter the version you want to use. Options v1/v2/v3/v4"
     required: true
     default: "v2"
 outputs:
