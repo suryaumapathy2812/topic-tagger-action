@@ -33314,12 +33314,12 @@ const executionScript = (directory) => {
 
 
         const implementations = filePaths.map(path => path.topics)
-        const temporary = implementations
+        const consolidatedData = implementations
             .reduce((accumulator, currentObject) => mergeDeep(accumulator, currentObject), {});
 
         console.log('Implemented Topics are: \n')
-        console.log(JSON.stringify(temporary, null, 2))
-        return filePaths
+        console.log(JSON.stringify(consolidatedData, null, 2))
+        return consolidatedData
 
     } catch (error) {
         console.error(error);
