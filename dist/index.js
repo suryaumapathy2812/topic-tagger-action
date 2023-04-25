@@ -33199,6 +33199,8 @@ function mergeDeep(target, ...sources) {
             if (isObject(source[key])) {
                 if (!target[key]) Object.assign(target, { [key]: {} });
                 mergeDeep(target[key], source[key]);
+            } else if (Array.isArray(source[key]) && source[key].length === 0) {
+                // Ignore empty arrays
             } else if (typeof source[key] === 'number' && target[key] !== undefined) {
                 target[key] += source[key];
             } else {
@@ -33307,15 +33309,12 @@ const executionScript = (directory) => {
 
             const finalResult = temporary.concepts;
 
-            console.info(`\n\n Topics Implemented in ${file.path} are : \n`);
-            console.info(`${JSON.stringify(finalResult)} \n\n`);
-
             filePaths[index]["topics"] = finalResult
 
         })
 
         console.log(filePaths.map(path => path.topics))
-
+        return filePaths
 
     } catch (error) {
         console.error(error);
