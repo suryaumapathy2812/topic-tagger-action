@@ -538,7 +538,7 @@ const executionScript = (directory) => {
 
         })
 
-        console.log(filePaths.map(path => path.topics))
+        console.log(JSON.stringify(filePaths.map(path => path.topics), null, 2))
         return filePaths
 
     } catch (error) {

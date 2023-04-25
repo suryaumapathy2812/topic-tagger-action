@@ -38,7 +38,7 @@ async function run() {
     const tags = [...new Set(_tags.flat())]
 
     core.info('JavaScript topics used in the codebase:');
-    core.info(tags);
+    core.info(JSON.stringify(tags, null, 4));
 
     core.setOutput('tags', tags);
   } catch (error) {

@@ -33313,7 +33313,7 @@ const executionScript = (directory) => {
 
         })
 
-        console.log(filePaths.map(path => path.topics))
+        console.log(JSON.stringify(filePaths.map(path => path.topics), null, 2))
         return filePaths
 
     } catch (error) {
@@ -85038,7 +85038,7 @@ async function run() {
     const tags = [...new Set(_tags.flat())]
 
     core.info('JavaScript topics used in the codebase:');
-    core.info(tags);
+    core.info(JSON.stringify(tags, null, 4));
 
     core.setOutput('tags', tags);
   } catch (error) {
