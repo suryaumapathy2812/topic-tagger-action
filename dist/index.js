@@ -33319,8 +33319,6 @@ const executionScript = (directory) => {
     }
 }
 
-executionScript("./src")
-
 module.exports = executionScript
 
 /***/ }),
