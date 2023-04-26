@@ -23,7 +23,7 @@ async function run() {
     core.info(`The version will be using is: ${version}`);
 
     const commitId = (process.env.GITHUB_SHA) ? process.env.GITHUB_SHA : null;
-    core.log(`Current commit ID: ${commitId}`);
+    core.info(`Current commit ID: ${commitId}`);
 
 
     let filePaths;
