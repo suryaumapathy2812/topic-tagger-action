@@ -1,17 +1,5 @@
 const core = require('@actions/core');
-const topicTagger = require('./src/topicTagger')
-
-const formatTable = (topicOutput) => {
-  let tableRows = '';
-  for (const topic in topicOutput) {
-    for (const subtopic in topicOutput[topic]) {
-      const count = topicOutput[topic][subtopic];
-      tableRows += `| ${topic} | ${subtopic} | ${count} |\n`;
-    }
-  }
-  return tableRows;
-};
-
+const topicTagger = require('./src/topicTagger');
 
 // most @actions toolkit packages have async methods
 async function run() {
@@ -58,14 +46,13 @@ async function run() {
     const tags = [...new Set(_tags.flat())]
     core.info('JavaScript topics used in the codebase:');
     core.info(JSON.stringify(tags, null, 4));
-    const tableData = formatTable(tags);
-    core.debug(tableData);
-
 
     core.setOutput('tags', tags);
     core.setOutput('tags_comment_id', commitId);
-    core.setOutput('tableData', tableData)
 
+    topicTagger.handleComment(tags, commitId, process.env.GITHUB_TOKEN).catch((error) => {
+      core.setFailed(error.message);
+    });
 
   } catch (error) {
     core.setFailed(error.message);

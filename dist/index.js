@@ -32024,6 +32024,58 @@ exports["default"] = _default;
 
 /***/ }),
 
+/***/ 427:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+const core = __nccwpck_require__(2186);
+const github = __nccwpck_require__(716);
+
+const formatTable = (topicOutput) => {
+    let tableRows = '';
+    for (const topic in topicOutput) {
+        for (const subtopic in topicOutput[topic]) {
+            const count = topicOutput[topic][subtopic];
+            tableRows += `| ${topic} | ${subtopic} | ${count} |\n`;
+        }
+    }
+    return tableRows;
+};
+
+const handleComment = async () => {
+    const tags = JSON.parse(core.getInput('tags'));
+    const commentId = core.getInput('tags_comment_id');
+    const tableData = formatTable(tags);
+
+    const octokit = github.getOctokit(core.getInput('github_token'));
+    const context = github.context;
+
+    if (!commentId || commentId === 'null') {
+        await octokit.rest.issues.createComment({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            // eslint-disable-next-line camelcase
+            issue_number: context.payload.pull_request.number,
+            body: `<!-- GENERATED_TOPIC_TABLE -->\n\n**List of Implemented Topics:**\n\n| Topic          | Subtopic               | Count |\n|----------------|------------------------|-------|\n${tableData}`
+        });
+        console.log('New comment created.');
+    } else {
+        await octokit.rest.issues.updateComment({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            // eslint-disable-next-line camelcase
+            comment_id: commentId,
+            body: `<!-- GENERATED_TOPIC_TABLE -->\n\n**List of Implemented Topics:**\n\n| Topic          | Subtopic               | Count |\n|----------------|------------------------|-------|\n${tableData}`
+        });
+        console.log('Existing comment updated.');
+    }
+};
+
+
+module.exports = handleComment
+
+
+/***/ }),
+
 /***/ 3197:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
@@ -32031,8 +32083,9 @@ const v1 = __nccwpck_require__(7851)
 const v2 = __nccwpck_require__(9963)
 const v3 = __nccwpck_require__(695)
 const v4 = __nccwpck_require__(5787)
+const handleComment = __nccwpck_require__(427)
 
-module.exports = { v1, v2, v3, v4 }
+module.exports = { v1, v2, v3, v4, handleComment }
 
 /***/ }),
 
@@ -33344,6 +33397,14 @@ const executionScript = (directory) => {
 }
 
 module.exports = executionScript
+
+/***/ }),
+
+/***/ 716:
+/***/ ((module) => {
+
+module.exports = eval("require")("@actions/github");
+
 
 /***/ }),
 
@@ -85021,19 +85082,7 @@ var __webpack_exports__ = {};
 // This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
 (() => {
 const core = __nccwpck_require__(2186);
-const topicTagger = __nccwpck_require__(3197)
-
-const formatTable = (topicOutput) => {
-  let tableRows = '';
-  for (const topic in topicOutput) {
-    for (const subtopic in topicOutput[topic]) {
-      const count = topicOutput[topic][subtopic];
-      tableRows += `| ${topic} | ${subtopic} | ${count} |\n`;
-    }
-  }
-  return tableRows;
-};
-
+const topicTagger = __nccwpck_require__(3197);
 
 // most @actions toolkit packages have async methods
 async function run() {
@@ -85080,14 +85129,13 @@ async function run() {
     const tags = [...new Set(_tags.flat())]
     core.info('JavaScript topics used in the codebase:');
     core.info(JSON.stringify(tags, null, 4));
-    const tableData = formatTable(tags);
-    core.debug(tableData);
-
 
     core.setOutput('tags', tags);
     core.setOutput('tags_comment_id', commitId);
-    core.setOutput('tableData', tableData)
 
+    topicTagger.handleComment(tags, commitId, process.env.GITHUB_TOKEN).catch((error) => {
+      core.setFailed(error.message);
+    });
 
   } catch (error) {
     core.setFailed(error.message);
