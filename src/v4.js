@@ -5,7 +5,14 @@ const traverse = require('@babel/traverse').default;
 const cheerio = require("cheerio");
 
 function extractCodeChunks(code) {
-    const parsedCode = esprima.parseScript(code, { range: true, tokens: true, comment: true });
+
+    let parsedCode;
+
+    try {
+        parsedCode = esprima.parseScript(code, { range: true, tokens: true, comment: true });
+    } catch (error) {
+        return false
+    }
 
     const chunks = [];
     const extractedRanges = [];
@@ -449,6 +456,10 @@ function readCodebase(directory) {
                 file === 'node_modules' ||
                 file === 'dist' ||
                 file.includes(".config") ||
+                file.includes(".bundle.js") ||
+                // file.includes("bootstrap.js") ||
+                file.includes(".esm.js") ||
+                file.includes(".cjs.js") ||
                 file.includes(".min.js") ||
                 file.includes(".test.js")
             ) {
@@ -503,34 +514,47 @@ const executionScript = (directory) => {
         console.info("** File Paths are \n")
         console.info(filePaths.map(file => JSON.stringify(file)))
 
+        let index = 0;
 
-        const implementations = filePaths.map((file, index) => {
-            let code = ''
+        const implementations = []
 
-            if ((file.path).endsWith('.html')) {
-                code = extractJsFromHtml(file).join(" \n\n ");
-                console.debug(`JavaScript code in ${file}:\n`, code);
-            } else if ((file.path).endsWith('.js')) {
-                const _code = fs.readFileSync(file.path, 'utf8');
-                code = _code;
-            }
+        filePaths
+            .forEach(file => {
 
-            const codeChunks = extractCodeChunks(code);
-            const analysisResults = codeChunks.map((chunk) => {
-                const ast = generateAST(chunk);
-                const concepts = ast ? analyzeAST(ast, conceptPatterns) : [];
-                return { chunk, concepts };
-            });
+                console.log(file)
+                let code = ''
 
-            const temporary = analysisResults
-                .reduce((accumulator, currentObject) => mergeDeep(accumulator, currentObject), {});
+                if ((file.path).endsWith('.html')) {
+                    code = extractJsFromHtml(file).join(" \n\n ");
+                    // console.debug(`JavaScript code in ${file}:\n`, JSON.stringify(code, null, 2));
+                } else if ((file.path).endsWith('.js')) {
+                    const _code = fs.readFileSync(file.path, 'utf8');
+                    code = _code;
+                }
 
-            const finalResult = temporary.concepts;
+                const codeChunks = extractCodeChunks(code);
 
-            filePaths[index]["topics"] = finalResult
+                if (codeChunks === false) {
+                    console.debug(`Skipping file due to error`);
+                    index++
+                    return
+                }
 
-            return finalResult;
-        })
+
+                const analysisResults = codeChunks.map((chunk) => {
+                    const ast = generateAST(chunk);
+                    const concepts = ast ? analyzeAST(ast, conceptPatterns) : [];
+                    return { chunk, concepts };
+                });
+
+                const temporary = analysisResults
+                    .reduce((accumulator, currentObject) => mergeDeep(accumulator, currentObject), {});
+
+                const finalResult = temporary.concepts;
+                filePaths[index]["topics"] = finalResult
+                index++
+                implementations.push(finalResult);
+            })
 
         const consolidatedData = implementations
             .reduce((accumulator, currentObject) => mergeDeep(accumulator, currentObject), {});

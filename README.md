@@ -39,7 +39,7 @@ jobs:
             new_comment=$(gh api repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments -f body="<!-- GENERATED_TOPIC_TABLE -->\n\n**List of Implemented Topics:**\n\n| Topic          | Subtopic               | Count |\n|----------------|------------------------|-------|\n${TABLE_DATA}")
             echo "New comment created."
           else
-            gh api repos/${{ github.repository }}/issues/comments/$comment_id -X PATCH -f body="<!-- GENERATED_TOPIC_TABLE -->\n\n**List of Implemented Topics:**\n\n| Topic          | Subtopic               | Count |\n|----------------|------------------------|-------|\n${TABLE_DATA}"
+            gh api repos/${{ github.repository }}/issues/comments/$comment_id -X PATCH -f body="<!-- GENERATED_TOPIC_TABLE --> \n\n**List of Implemented Topics:**\n\n| Topic          | Subtopic               | Count |\n|----------------|------------------------|-------|\n${TABLE_DATA}"
             echo "Existing comment updated."
           fi
 
