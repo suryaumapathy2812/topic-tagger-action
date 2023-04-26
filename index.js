@@ -1,6 +1,18 @@
 const core = require('@actions/core');
 const topicTagger = require('./src/topicTagger')
 
+const formatTable = (topicOutput) => {
+  let tableRows = '';
+  for (const topic in topicOutput) {
+    for (const subtopic in topicOutput[topic]) {
+      const count = topicOutput[topic][subtopic];
+      tableRows += `| ${topic} | ${subtopic} | ${count} |\n`;
+    }
+  }
+  return tableRows;
+};
+
+
 // most @actions toolkit packages have async methods
 async function run() {
   try {
@@ -10,8 +22,11 @@ async function run() {
     const version = core.getInput('version');
     core.info(`The version will be using is: ${version}`);
 
-    let filePaths;
+    const commitId = (process.env.GITHUB_SHA) ? process.env.GITHUB_SHA : null;
+    core.log(`Current commit ID: ${commitId}`);
 
+
+    let filePaths;
     switch (version) {
       case "v1":
         filePaths = topicTagger.v1(startPoint);
@@ -43,8 +58,15 @@ async function run() {
     const tags = [...new Set(_tags.flat())]
     core.info('JavaScript topics used in the codebase:');
     core.info(JSON.stringify(tags, null, 4));
+    const tableData = formatTable(tags);
+    core.debug(tableData);
+
 
     core.setOutput('tags', tags);
+    core.setOutput('tags_comment_id', commitId);
+    core.setOutput('tableData', tableData)
+
+
   } catch (error) {
     core.setFailed(error.message);
   }
