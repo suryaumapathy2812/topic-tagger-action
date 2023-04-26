@@ -92094,7 +92094,7 @@ async function run() {
     core.setOutput('tags_comment_id', commitId);
 
     const githubToken = core.getInput('github_token')
-    topicTagger.handleComment(tags, githubToken).catch((error) => {
+    await topicTagger.handleComment(tags, githubToken).catch((error) => {
       core.setFailed(error.message);
     });
 
@@ -92103,7 +92103,10 @@ async function run() {
   }
 }
 
-run();
+
+(async () => {
+  await run();
+})()
 
 })();
 
