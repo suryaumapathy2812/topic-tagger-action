@@ -11,7 +11,10 @@ inputs:
   version:
     description: "Enter the version you want to use. Options v1/v2/v3/v4"
     required: true
-    default: "v2"
+    default: "v4"
+  github_token:
+    description: 'GitHub token'
+    required: true
 outputs:
   tags: # output will be available to future steps
     description: "list of topic used in this project"
