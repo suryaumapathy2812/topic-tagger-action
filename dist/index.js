@@ -38951,31 +38951,19 @@ const formatTable = (topicOutput) => {
 };
 
 const handleComment = async (tags) => {
-    core.info("Entering handleComment")
+    core.debug("Entering handleComment")
 
-    // for (const key in process.env) {
-    //     core.info(`${key}: ${process.env[key]}`);
-    // }
-
-    core.debug(core.getInput('github_token'))
     const tableData = formatTable(tags);
-
     core.info(JSON.stringify(tableData))
+
 
     const octokit = github.getOctokit(core.getInput('github_token'));
     const context = github.context;
-    core.info(JSON.stringify(context, null, 2))
-
-    // core.debug("Github Event =>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
-    // core.debug(octokit.event)
-    // core.debug(JSON.stringify(octokit.event, null, 2))
-    // core.debug("Github Event =>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
-
+    core.debug(JSON.stringify(context, null, 2))
 
 
     const fullName = context.payload.repository.full_name;
     const [owner, repo] = fullName.split("/");
-
 
     // Get the pull request number from the event
     let pullRequestId;
@@ -39007,7 +38995,7 @@ const handleComment = async (tags) => {
 
 
     const generatedComment = comments.find((comment) => comment.body.includes('<!-- GENERATED_TOPIC_TABLE -->'));
-    core.info(JSON.stringify(generatedComment, null, 2));
+    core.debug(JSON.stringify(generatedComment, null, 2));
 
     let result;
 
@@ -39020,7 +39008,7 @@ const handleComment = async (tags) => {
             issue_number: pullRequestId,
             body: `<!-- GENERATED_TOPIC_TABLE -->\n\n**List of Implemented Topics:**\n\n| Topic          | Subtopic               | Count |\n|----------------|------------------------|-------|\n${tableData}`
         });
-        console.log('New comment created.');
+        core.info('New comment created.');
     } else {
         core.info('Updating Existing Comment')
         result = await octokit.rest.issues.updateComment({
@@ -39030,7 +39018,7 @@ const handleComment = async (tags) => {
             comment_id: generatedComment.id,
             body: `<!-- GENERATED_TOPIC_TABLE -->\n\n**List of Implemented Topics:**\n\n| Topic          | Subtopic               | Count |\n|----------------|------------------------|-------|\n${tableData}`
         });
-        console.log('Existing comment updated.');
+        core.info('Existing comment updated.');
     }
 
     core.info('Exiting handleComment');
@@ -92127,14 +92115,6 @@ async function run() {
 
 
     core.debug(JSON.stringify(filePaths)); // debug is only output if you set the secret `ACTIONS_RUNNER_DEBUG` to true
-
-
-    // if (version === 'v4') {
-    //   core.setOutput('tags', filePaths);
-    //   return;
-    // }
-    // const _tags = filePaths.map(file => file.topics)
-    // const tags = [...new Set(_tags.flat())]
 
     const tags = filePaths
 
