@@ -35,7 +35,7 @@ const handleComment = async (tags) => {
 
 
 
-    const fullName = context['repository']['full_name'];
+    const fullName = context.payload.repository.full_name;
     const [owner, repo] = fullName.split("/");
 
 
