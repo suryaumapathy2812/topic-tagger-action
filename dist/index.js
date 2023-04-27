@@ -38965,7 +38965,7 @@ const handleComment = async (tags) => {
 
 
     for (const key in process.env) {
-        core.log(`${key}: ${process.env[key]}`);
+        core.info(`${key}: ${process.env[key]}`);
     }
 
 
