@@ -12,24 +12,12 @@ const formatTable = (topicOutput) => {
     return tableRows;
 };
 
-
-const parsePullRequestId = githubReference => {
-    const result = /refs\/pull\/(\d+)\/merge/g.exec(githubReference);
-    if (!result) throw new Error("Reference not found.");
-    const [, pullRequestId] = result;
-    return pullRequestId;
-};
-
-
 const handleComment = async (tags) => {
     core.info("Entering handleComment")
 
-
-
-    for (const key in process.env) {
-        core.info(`${key}: ${process.env[key]}`);
-    }
-
+    // for (const key in process.env) {
+    //     core.info(`${key}: ${process.env[key]}`);
+    // }
 
     core.debug(core.getInput('github_token'))
     const tableData = formatTable(tags);
@@ -47,10 +35,22 @@ const handleComment = async (tags) => {
 
 
     // Get the pull request number from the event
-    const pullRequestId = parsePullRequestId(process.env.GITHUB_REF);
+    let pullRequestId;
+    if (context.issue.number) {
+        // Return issue number if present
+        pullRequestId = context.issue.number;
+    } else {
+        // Otherwise return issue number from commit
+        pullRequestId = (
+            await github.rest.repos.listPullRequestsAssociatedWithCommit({
+                // eslint-disable-next-line camelcase
+                commit_sha: context.sha,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+            })
+        ).data[0].number;
+    }
     core.info(pullRequestId)
-    // const pullRequestNumber = github.event.pull_request.number;
-    // core.info(pullRequestNumber)
 
 
     // Retrieve comments for the current pull request
