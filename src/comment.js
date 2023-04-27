@@ -13,12 +13,15 @@ const formatTable = (topicOutput) => {
 };
 
 const handleComment = async (tags, githubToken) => {
+    core.log("Entering handleComment")
     const commentId = core.getInput('tags_comment_id');
     const tableData = formatTable(tags);
 
+    core.log(JSON.stringify(tableData))
+
     const octokit = github.getOctokit(githubToken);
     const context = github.context;
-
+    core.log(JSON.stringify(context, null, 2))
 
     // Retrieve comments for the current pull request
     const comments = await octokit.paginate(octokit.rest.issues.listComments, {
@@ -27,12 +30,17 @@ const handleComment = async (tags, githubToken) => {
         // eslint-disable-next-line camelcase
         issue_number: context.payload.pull_request.number,
     });
+    core.info(JSON.stringify(comments, null, 2));
+
 
     const generatedComment = comments.find((comment) => comment.body.includes('<!-- GENERATED_TOPIC_TABLE -->'));
+    core.info(JSON.stringify(generatedComment, null, 2));
 
+    let result;
 
     if (!generatedComment) {
-        await octokit.rest.issues.createComment({
+        core.log('Creating new Comment')
+        result = await octokit.rest.issues.createComment({
             owner: context.repo.owner,
             repo: context.repo.repo,
             // eslint-disable-next-line camelcase
@@ -41,7 +49,8 @@ const handleComment = async (tags, githubToken) => {
         });
         console.log('New comment created.');
     } else {
-        await octokit.rest.issues.updateComment({
+        core.log('Updating Existing Comment')
+        result = await octokit.rest.issues.updateComment({
             owner: context.repo.owner,
             repo: context.repo.repo,
             // eslint-disable-next-line camelcase
@@ -50,6 +59,11 @@ const handleComment = async (tags, githubToken) => {
         });
         console.log('Existing comment updated.');
     }
+
+    core.log('Exiting handleComment');
+
+    return result
+
 };
 
 
