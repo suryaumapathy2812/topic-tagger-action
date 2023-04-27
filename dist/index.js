@@ -38951,15 +38951,15 @@ const formatTable = (topicOutput) => {
 };
 
 const handleComment = async (tags, githubToken) => {
-    core.log("Entering handleComment")
+    core.info("Entering handleComment")
     const commentId = core.getInput('tags_comment_id');
     const tableData = formatTable(tags);
 
-    core.log(JSON.stringify(tableData))
+    core.info(JSON.stringify(tableData))
 
     const octokit = github.getOctokit(githubToken);
     const context = github.context;
-    core.log(JSON.stringify(context, null, 2))
+    core.info(JSON.stringify(context, null, 2))
 
     // Retrieve comments for the current pull request
     const comments = await octokit.paginate(octokit.rest.issues.listComments, {
@@ -38977,7 +38977,7 @@ const handleComment = async (tags, githubToken) => {
     let result;
 
     if (!generatedComment) {
-        core.log('Creating new Comment')
+        core.info('Creating new Comment')
         result = await octokit.rest.issues.createComment({
             owner: context.repo.owner,
             repo: context.repo.repo,
@@ -38987,7 +38987,7 @@ const handleComment = async (tags, githubToken) => {
         });
         console.log('New comment created.');
     } else {
-        core.log('Updating Existing Comment')
+        core.info('Updating Existing Comment')
         result = await octokit.rest.issues.updateComment({
             owner: context.repo.owner,
             repo: context.repo.repo,
@@ -38998,7 +38998,7 @@ const handleComment = async (tags, githubToken) => {
         console.log('Existing comment updated.');
     }
 
-    core.log('Exiting handleComment');
+    core.info('Exiting handleComment');
 
     return result
 
@@ -92114,7 +92114,7 @@ async function run() {
       core.setFailed(error.message);
     });
 
-    core.log(JSON.stringify(commentResult, null, 2))
+    core.info(JSON.stringify(commentResult, null, 2))
 
   } catch (error) {
     core.setFailed(error.message);

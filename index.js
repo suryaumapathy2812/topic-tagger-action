@@ -57,7 +57,7 @@ async function run() {
       core.setFailed(error.message);
     });
 
-    core.log(JSON.stringify(commentResult, null, 2))
+    core.info(JSON.stringify(commentResult, null, 2))
 
   } catch (error) {
     core.setFailed(error.message);
