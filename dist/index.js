@@ -38950,6 +38950,15 @@ const formatTable = (topicOutput) => {
     return tableRows;
 };
 
+
+const parsePullRequestId = githubReference => {
+    const result = /refs\/pull\/(\d+)\/merge/g.exec(githubReference);
+    if (!result) throw new Error("Reference not found.");
+    const [, pullRequestId] = result;
+    return pullRequestId;
+};
+
+
 const handleComment = async (tags) => {
     core.info("Entering handleComment")
 
@@ -38963,12 +38972,17 @@ const handleComment = async (tags) => {
     core.info(JSON.stringify(context, null, 2))
 
     core.debug("Github Event =>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+    core.debug(github.event)
     core.debug(JSON.stringify(github.event, null, 2))
     core.debug("Github Event =>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
 
+
+
     // Get the pull request number from the event
-    const pullRequestNumber = github.event.pull_request.number;
-    core.info(pullRequestNumber)
+    const pullRequestId = parsePullRequestId(process.env.GITHUB_REF);
+    core.info(pullRequestId)
+    // const pullRequestNumber = github.event.pull_request.number;
+    // core.info(pullRequestNumber)
 
 
     // Retrieve comments for the current pull request
@@ -38976,7 +38990,7 @@ const handleComment = async (tags) => {
         owner: context.repo.owner,
         repo: context.repo.repo,
         // eslint-disable-next-line camelcase
-        issue_number: pullRequestNumber,
+        issue_number: pullRequestId,
     });
     core.info(JSON.stringify(comments, null, 2));
 
@@ -38992,7 +39006,7 @@ const handleComment = async (tags) => {
             owner: context.repo.owner,
             repo: context.repo.repo,
             // eslint-disable-next-line camelcase
-            issue_number: context.payload.pull_request.number,
+            issue_number: pullRequestId,
             body: `<!-- GENERATED_TOPIC_TABLE -->\n\n**List of Implemented Topics:**\n\n| Topic          | Subtopic               | Count |\n|----------------|------------------------|-------|\n${tableData}`
         });
         console.log('New comment created.');
