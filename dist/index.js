@@ -38972,6 +38972,11 @@ const handleComment = async (tags) => {
     core.debug("Github Event =>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
 
 
+
+    const fullName = context['repository']['full_name'];
+    const [owner, repo] = fullName.split("/");
+
+
     // Get the pull request number from the event
     let pullRequestId;
     if (context.issue.number) {
@@ -38983,8 +38988,8 @@ const handleComment = async (tags) => {
             await github.rest.repos.listPullRequestsAssociatedWithCommit({
                 // eslint-disable-next-line camelcase
                 commit_sha: context.sha,
-                owner: context.repo.owner,
-                repo: context.repo.repo,
+                owner,
+                repo
             })
         ).data[0].number;
     }
@@ -38993,8 +38998,8 @@ const handleComment = async (tags) => {
 
     // Retrieve comments for the current pull request
     const comments = await octokit.paginate(octokit.rest.issues.listComments, {
-        owner: context.repo.owner,
-        repo: context.repo.repo,
+        owner,
+        repo,
         // eslint-disable-next-line camelcase
         issue_number: pullRequestId,
     });
@@ -39009,8 +39014,8 @@ const handleComment = async (tags) => {
     if (!generatedComment) {
         core.info('Creating new Comment')
         result = await octokit.rest.issues.createComment({
-            owner: context.repo.owner,
-            repo: context.repo.repo,
+            owner,
+            repo,
             // eslint-disable-next-line camelcase
             issue_number: pullRequestId,
             body: `<!-- GENERATED_TOPIC_TABLE -->\n\n**List of Implemented Topics:**\n\n| Topic          | Subtopic               | Count |\n|----------------|------------------------|-------|\n${tableData}`
@@ -39019,8 +39024,8 @@ const handleComment = async (tags) => {
     } else {
         core.info('Updating Existing Comment')
         result = await octokit.rest.issues.updateComment({
-            owner: context.repo.owner,
-            repo: context.repo.repo,
+            owner,
+            repo,
             // eslint-disable-next-line camelcase
             comment_id: generatedComment.id,
             body: `<!-- GENERATED_TOPIC_TABLE -->\n\n**List of Implemented Topics:**\n\n| Topic          | Subtopic               | Count |\n|----------------|------------------------|-------|\n${tableData}`
