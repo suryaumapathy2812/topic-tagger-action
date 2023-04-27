@@ -12,23 +12,33 @@ const formatTable = (topicOutput) => {
     return tableRows;
 };
 
-const handleComment = async (tags, githubToken) => {
+const handleComment = async (tags) => {
     core.info("Entering handleComment")
-    const commentId = core.getInput('tags_comment_id');
+
+    core.debug(core.getInput('github_token'))
     const tableData = formatTable(tags);
 
     core.info(JSON.stringify(tableData))
 
-    const octokit = github.getOctokit(githubToken);
+    const octokit = github.getOctokit(core.getInput('github_token'));
     const context = github.context;
     core.info(JSON.stringify(context, null, 2))
+
+    core.debug("Github Event =>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+    core.debug(JSON.stringify(github.event, null, 2))
+    core.debug("Github Event =>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+
+    // Get the pull request number from the event
+    const pullRequestNumber = github.event.pull_request.number;
+    core.info(pullRequestNumber)
+
 
     // Retrieve comments for the current pull request
     const comments = await octokit.paginate(octokit.rest.issues.listComments, {
         owner: context.repo.owner,
         repo: context.repo.repo,
         // eslint-disable-next-line camelcase
-        issue_number: context.payload.pull_request.number,
+        issue_number: pullRequestNumber,
     });
     core.info(JSON.stringify(comments, null, 2));
 
@@ -54,7 +64,7 @@ const handleComment = async (tags, githubToken) => {
             owner: context.repo.owner,
             repo: context.repo.repo,
             // eslint-disable-next-line camelcase
-            comment_id: commentId,
+            comment_id: generatedComment.id,
             body: `<!-- GENERATED_TOPIC_TABLE -->\n\n**List of Implemented Topics:**\n\n| Topic          | Subtopic               | Count |\n|----------------|------------------------|-------|\n${tableData}`
         });
         console.log('Existing comment updated.');

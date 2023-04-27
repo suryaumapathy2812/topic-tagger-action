@@ -52,8 +52,7 @@ async function run() {
     core.setOutput('tags', tags);
     core.setOutput('tags_comment_id', commitId);
 
-    const githubToken = core.getInput('github_token')
-    const commentResult = await topicTagger.handleComment(tags, githubToken).catch((error) => {
+    const commentResult = await topicTagger.handleComment(tags).catch((error) => {
       core.setFailed(error.message);
     });
 
