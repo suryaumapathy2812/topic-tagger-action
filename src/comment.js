@@ -28,10 +28,10 @@ const handleComment = async (tags) => {
     const context = github.context;
     core.info(JSON.stringify(context, null, 2))
 
-    core.debug("Github Event =>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
-    core.debug(github.event)
-    core.debug(JSON.stringify(github.event, null, 2))
-    core.debug("Github Event =>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+    // core.debug("Github Event =>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+    // core.debug(octokit.event)
+    // core.debug(JSON.stringify(octokit.event, null, 2))
+    // core.debug("Github Event =>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
 
 
 
@@ -47,7 +47,7 @@ const handleComment = async (tags) => {
     } else {
         // Otherwise return issue number from commit
         pullRequestId = (
-            await github.rest.repos.listPullRequestsAssociatedWithCommit({
+            await octokit.rest.repos.listPullRequestsAssociatedWithCommit({
                 // eslint-disable-next-line camelcase
                 commit_sha: context.sha,
                 owner,
