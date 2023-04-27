@@ -40321,8 +40321,8 @@ const executionScript = (directory) => {
         const consolidatedData = implementations
             .reduce((accumulator, currentObject) => mergeDeep(accumulator, currentObject), {});
 
-        console.log('Implemented Topics are: \n')
-        console.log(JSON.stringify(consolidatedData, null, 2))
+        console.debug('Implemented Topics are: \n')
+        console.debug(JSON.stringify(consolidatedData, null, 2))
         return consolidatedData
 
     } catch (error) {
@@ -92086,7 +92086,7 @@ async function run() {
         filePaths = topicTagger.v4(startPoint);
         break;
       default:
-        filePaths = topicTagger.v2(startPoint);
+        filePaths = topicTagger.v4(startPoint);
         break;
     }
 
@@ -92094,13 +92094,15 @@ async function run() {
     core.debug(JSON.stringify(filePaths)); // debug is only output if you set the secret `ACTIONS_RUNNER_DEBUG` to true
 
 
-    if (version === 'v4') {
-      core.setOutput('tags', filePaths);
-      return;
-    }
+    // if (version === 'v4') {
+    //   core.setOutput('tags', filePaths);
+    //   return;
+    // }
+    // const _tags = filePaths.map(file => file.topics)
+    // const tags = [...new Set(_tags.flat())]
 
-    const _tags = filePaths.map(file => file.topics)
-    const tags = [...new Set(_tags.flat())]
+    const tags = filePaths
+
     core.info('JavaScript topics used in the codebase:');
     core.info(JSON.stringify(tags, null, 4));
 

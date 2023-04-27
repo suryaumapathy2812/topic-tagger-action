@@ -559,8 +559,8 @@ const executionScript = (directory) => {
         const consolidatedData = implementations
             .reduce((accumulator, currentObject) => mergeDeep(accumulator, currentObject), {});
 
-        console.log('Implemented Topics are: \n')
-        console.log(JSON.stringify(consolidatedData, null, 2))
+        console.debug('Implemented Topics are: \n')
+        console.debug(JSON.stringify(consolidatedData, null, 2))
         return consolidatedData
 
     } catch (error) {
