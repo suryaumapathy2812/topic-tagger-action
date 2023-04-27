@@ -38962,6 +38962,13 @@ const parsePullRequestId = githubReference => {
 const handleComment = async (tags) => {
     core.info("Entering handleComment")
 
+
+
+    for (const key in process.env) {
+        core.log(`${key}: ${process.env[key]}`);
+    }
+
+
     core.debug(core.getInput('github_token'))
     const tableData = formatTable(tags);
 
@@ -38975,7 +38982,6 @@ const handleComment = async (tags) => {
     core.debug(github.event)
     core.debug(JSON.stringify(github.event, null, 2))
     core.debug("Github Event =>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
-
 
 
     // Get the pull request number from the event
