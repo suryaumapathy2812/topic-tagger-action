@@ -70,7 +70,7 @@ function getPreviousResult() {
     core.info(" records ======================================== >")
     core.info(result)
     core.info(" records ======================================== >")
-    return true;
+    return JSON.parse(records);
   } catch (error) {
     return false;
   }
@@ -84,7 +84,7 @@ function writeToFile(startPoint, content) {
   const writePath = absolutePath + "/output/topic_tagger_results.json"
   core.info(writePath)
 
-  fs.writeFileSync(writePath, content);
+  fs.writeFileSync(writePath, JSON.stringify(content));
 
   core.info("File written successfully\n");
   core.info("The written has the following contents:");
