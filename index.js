@@ -64,9 +64,14 @@ function getPreviousResult() {
   try {
     const absolutePath = path.resolve("./");
     core.info(absolutePath)
-    const records = absolutePath + "/records/latest-results.json"
+    const records = absolutePath + "/records"
     core.info(records)
-    const result = fs.readFileSync(records, 'utf-8')
+
+    if (!fs.existsSync(records)) {
+      return false;
+    }
+
+    const result = fs.readFileSync(records + '/latest-results.json', 'utf-8')
     core.info(" records ======================================== >")
     core.info(result)
     core.info(" records ======================================== >")
@@ -81,10 +86,14 @@ function writeToFile(startPoint, content) {
   const absolutePath = path.resolve(startPoint);
   core.info(absolutePath)
 
-  const writePath = absolutePath + "/output/topic_tagger_results.json"
+  const writePath = absolutePath + "/output"
   core.info(writePath)
 
-  fs.writeFileSync(writePath, JSON.stringify(content));
+  if (!fs.existsSync(writePath)) {
+    fs.mkdirSync(writePath);
+  }
+
+  fs.writeFileSync(writePath + "/topic_tagger_results.json", JSON.stringify(content));
 
   core.info("File written successfully\n");
   core.info("The written has the following contents:");
