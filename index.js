@@ -51,9 +51,8 @@ async function run() {
         core.setFailed(error.message);
       });
 
-    core.info(process.env.workspace)
-
     core.info(JSON.stringify(commentResult, null, 2))
+
     const previousResult = await topicTagger.downloadArtifact()
       .catch((error) => {
         console.error(error);

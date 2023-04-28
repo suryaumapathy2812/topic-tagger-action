@@ -45088,10 +45088,15 @@ const downloadArtifact = async () => {
     const absolutePath = path.resolve("./");
     const outputPath = absolutePath + "/records"
 
+    const workflowPath = github.context.workflow.split("/")
+    const workflowIdOrFileName = workflowPath[workflowPath.length - 1];
+    core.info(workflowIdOrFileName)
 
     const { data: runs } = await octokit.rest.actions.listWorkflowRuns({
         owner,
         repo,
+        // eslint-disable-next-line camelcase
+        workflow_id: workflowIdOrFileName,
         status: "success",
     });
 
@@ -45100,16 +45105,11 @@ const downloadArtifact = async () => {
         return;
     }
 
-    const workflowPath = github.context.workflow.split("/")
-    const workflowIdOrFileName = workflowPath[workflowPath.length - 1];
-    core.info(workflowIdOrFileName)
 
     const runId = runs.workflow_runs[0].id;
     const { data: artifacts } = await octokit.rest.actions.listWorkflowRunArtifacts({
         owner,
         repo,
-        // eslint-disable-next-line camelcase
-        workflow_id: workflowIdOrFileName,
         // eslint-disable-next-line camelcase
         run_id: runId,
     });
@@ -101132,9 +101132,8 @@ async function run() {
         core.setFailed(error.message);
       });
 
-    core.info(process.env.workspace)
-
     core.info(JSON.stringify(commentResult, null, 2))
+
     const previousResult = await topicTagger.downloadArtifact()
       .catch((error) => {
         console.error(error);
