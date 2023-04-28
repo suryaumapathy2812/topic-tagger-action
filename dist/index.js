@@ -92131,7 +92131,8 @@ async function run() {
     });
 
     core.info(JSON.stringify(commentResult, null, 2))
-    getPreviousResult();
+    const previousResult = getPreviousResult();
+    core.info(previousResult)
     writeToFile(startPoint, tags);
 
   } catch (error) {
@@ -92140,14 +92141,19 @@ async function run() {
 }
 
 function getPreviousResult() {
-  const absolutePath = path.resolve("./");
-  core.info(absolutePath)
-
-  const records = absolutePath + "/records"
-  core.info(records)
-  core.info(" records ======================================== >")
-  core.info(fs.readFileSync(records, 'utf-8'))
-  core.info(" records ======================================== >")
+  try {
+    const absolutePath = path.resolve("./");
+    core.info(absolutePath)
+    const records = absolutePath + "/records/latest-results.json"
+    core.info(records)
+    const result = fs.readFileSync(records, 'utf-8')
+    core.info(" records ======================================== >")
+    core.info(result)
+    core.info(" records ======================================== >")
+    return true;
+  } catch (error) {
+    return false;
+  }
 }
 
 
