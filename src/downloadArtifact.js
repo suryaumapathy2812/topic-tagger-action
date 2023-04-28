@@ -10,7 +10,8 @@ const path = require('path');
 
 const downloadArtifact = async () => {
 
-    const token = process.env.GITHUB_TOKEN;
+    const token = core.getInput('github_token');
+    core.debug(token)
     const artifactName = "latest-results";
 
     const octokit = github.getOctokit(token);
@@ -18,7 +19,6 @@ const downloadArtifact = async () => {
     const fullName = context.payload.repository.full_name;
 
     const [owner, repo] = fullName.split("/");
-
 
     const absolutePath = path.resolve("./");
     const outputPath = absolutePath + "/records"
