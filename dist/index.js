@@ -45073,6 +45073,7 @@ const extract = __nccwpck_require__(460);
 const path = __nccwpck_require__(1017);
 
 const downloadArtifact = async () => {
+    core.debug("Entering downloadArtifact")
 
     const token = core.getInput('github_token');
     core.debug(token)
@@ -45099,7 +45100,9 @@ const downloadArtifact = async () => {
         return;
     }
 
-    const workflowIdOrFileName = github.context.workflow;
+    const workflowPath = github.context.workflow.split("/")
+    const workflowIdOrFileName = workflowPath[workflowPath.length - 1];
+    core.info(workflowIdOrFileName)
 
     const runId = runs.workflow_runs[0].id;
     const { data: artifacts } = await octokit.rest.actions.listWorkflowRunArtifacts({
@@ -101124,9 +101127,10 @@ async function run() {
     core.setOutput('tags', tags);
     core.setOutput('tags_comment_id', commitId);
 
-    const commentResult = await topicTagger.handleComment(tags).catch((error) => {
-      core.setFailed(error.message);
-    });
+    const commentResult = await topicTagger.handleComment(tags)
+      .catch((error) => {
+        core.setFailed(error.message);
+      });
 
     core.info(process.env.workspace)
 

@@ -46,9 +46,10 @@ async function run() {
     core.setOutput('tags', tags);
     core.setOutput('tags_comment_id', commitId);
 
-    const commentResult = await topicTagger.handleComment(tags).catch((error) => {
-      core.setFailed(error.message);
-    });
+    const commentResult = await topicTagger.handleComment(tags)
+      .catch((error) => {
+        core.setFailed(error.message);
+      });
 
     core.info(process.env.workspace)
 

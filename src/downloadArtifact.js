@@ -9,6 +9,7 @@ const extract = require("extract-zip");
 const path = require('path');
 
 const downloadArtifact = async () => {
+    core.debug("Entering downloadArtifact")
 
     const token = core.getInput('github_token');
     core.debug(token)
@@ -35,7 +36,9 @@ const downloadArtifact = async () => {
         return;
     }
 
-    const workflowIdOrFileName = github.context.workflow;
+    const workflowPath = github.context.workflow.split("/")
+    const workflowIdOrFileName = workflowPath[workflowPath.length - 1];
+    core.info(workflowIdOrFileName)
 
     const runId = runs.workflow_runs[0].id;
     const { data: artifacts } = await octokit.rest.actions.listWorkflowRunArtifacts({
