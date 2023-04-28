@@ -92163,6 +92163,8 @@ function getPreviousResult() {
 
 
 function writeToFile(startPoint, content) {
+  const fileName = "/topic_tagger_results.json"
+
   const absolutePath = path.resolve(startPoint);
   core.info(absolutePath)
 
@@ -92173,11 +92175,11 @@ function writeToFile(startPoint, content) {
     fs.mkdirSync(writePath);
   }
 
-  fs.writeFileSync(writePath + "/topic_tagger_results.json", JSON.stringify(content));
+  fs.writeFileSync(writePath + fileName, JSON.stringify(content));
 
   core.info("File written successfully\n");
   core.info("The written has the following contents:");
-  core.debug(fs.readFileSync(writePath, "utf8"));
+  core.debug(fs.readFileSync(writePath + fileName, "utf8"));
 
 }
 
