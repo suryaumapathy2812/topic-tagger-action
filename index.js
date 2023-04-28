@@ -50,6 +50,8 @@ async function run() {
       core.setFailed(error.message);
     });
 
+    core.info(process.env.workspace)
+
     core.info(JSON.stringify(commentResult, null, 2))
     const previousResult = getPreviousResult();
     core.info(previousResult)
@@ -95,11 +97,12 @@ function writeToFile(startPoint, content) {
     fs.mkdirSync(writePath);
   }
 
-  fs.writeFileSync(writePath + fileName, JSON.stringify(content));
+  core.info(JSON.stringify(content, null, 2))
+  fs.writeFileSync(writePath + fileName, JSON.stringify(content), 'utf-8');
 
   core.info("File written successfully\n");
   core.info("The written has the following contents:");
-  core.debug(fs.readFileSync(writePath + fileName, "utf8"));
+  core.debug(fs.readFileSync(writePath + fileName, "utf-8"));
 
 }
 

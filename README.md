@@ -40,7 +40,7 @@ jobs:
       - uses: actions/upload-artifact@v3
         with:
           name: latest-results
-          path: './output/latest-results.json'
+          path: '${{ github.workspace }}/*/latest-results.json'
           if-no-files-found: error
 
 ```
