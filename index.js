@@ -1,5 +1,7 @@
 const core = require('@actions/core');
 const topicTagger = require('./src/topicTagger');
+const fs = require('fs');
+const path = require("path");
 
 // most @actions toolkit packages have async methods
 async function run() {
@@ -49,10 +51,39 @@ async function run() {
     });
 
     core.info(JSON.stringify(commentResult, null, 2))
+    getPreviousResult();
+    writeToFile(startPoint, tags);
 
   } catch (error) {
     core.setFailed(error.message);
   }
+}
+
+function getPreviousResult() {
+  const absolutePath = path.resolve("./");
+  core.info(absolutePath)
+
+  const records = absolutePath + "/records"
+  core.info(records)
+  core.info(" records ======================================== >")
+  core.info(fs.readFileSync(records, 'utf-8'))
+  core.info(" records ======================================== >")
+}
+
+
+function writeToFile(startPoint, content) {
+  const absolutePath = path.resolve(startPoint);
+  core.info(absolutePath)
+
+  const writePath = absolutePath + "/output/topic_tagger_results.json"
+  core.info(writePath)
+
+  fs.writeFileSync(writePath, content);
+
+  core.info("File written successfully\n");
+  core.info("The written has the following contents:");
+  core.debug(fs.readFileSync(writePath, "utf8"));
+
 }
 
 

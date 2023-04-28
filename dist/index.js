@@ -92080,6 +92080,8 @@ var __webpack_exports__ = {};
 (() => {
 const core = __nccwpck_require__(2186);
 const topicTagger = __nccwpck_require__(3197);
+const fs = __nccwpck_require__(7147);
+const path = __nccwpck_require__(1017);
 
 // most @actions toolkit packages have async methods
 async function run() {
@@ -92129,10 +92131,39 @@ async function run() {
     });
 
     core.info(JSON.stringify(commentResult, null, 2))
+    getPreviousResult();
+    writeToFile(startPoint, tags);
 
   } catch (error) {
     core.setFailed(error.message);
   }
+}
+
+function getPreviousResult() {
+  const absolutePath = path.resolve("./");
+  core.info(absolutePath)
+
+  const records = absolutePath + "/records"
+  core.info(records)
+  core.info(" records ======================================== >")
+  core.info(fs.readFileSync(records, 'utf-8'))
+  core.info(" records ======================================== >")
+}
+
+
+function writeToFile(startPoint, content) {
+  const absolutePath = path.resolve(startPoint);
+  core.info(absolutePath)
+
+  const writePath = absolutePath + "/output/topic_tagger_results.json"
+  core.info(writePath)
+
+  fs.writeFileSync(writePath, content);
+
+  core.info("File written successfully\n");
+  core.info("The written has the following contents:");
+  core.debug(fs.readFileSync(writePath, "utf8"));
+
 }
 
 
