@@ -92178,6 +92178,8 @@ function writeToFile(startPoint, content) {
   }
 
   core.info(JSON.stringify(content, null, 2))
+  
+  core.info(writePath + fileName)
   fs.writeFileSync(writePath + fileName, JSON.stringify(content), 'utf-8');
 
   core.info("File written successfully\n");
