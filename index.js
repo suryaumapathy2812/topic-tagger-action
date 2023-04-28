@@ -53,33 +53,16 @@ async function run() {
     core.info(process.env.workspace)
 
     core.info(JSON.stringify(commentResult, null, 2))
-    const previousResult = getPreviousResult();
+    const previousResult = await topicTagger.downloadArtifact()
+      .catch((error) => {
+        console.error(error);
+        process.exit(1);
+      });
     core.info(previousResult)
     writeToFile(startPoint, tags);
 
   } catch (error) {
     core.setFailed(error.message);
-  }
-}
-
-function getPreviousResult() {
-  try {
-    const absolutePath = path.resolve("./");
-    core.info(absolutePath)
-    const records = absolutePath + "/records"
-    core.info(records)
-
-    if (!fs.existsSync(records)) {
-      return false;
-    }
-
-    const result = fs.readFileSync(records + '/latest-results.json', 'utf-8')
-    core.info(" records ======================================== >")
-    core.info(result)
-    core.info(" records ======================================== >")
-    return JSON.parse(records);
-  } catch (error) {
-    return false;
   }
 }
 
@@ -98,7 +81,7 @@ function writeToFile(startPoint, content) {
   }
 
   core.info(JSON.stringify(content, null, 2))
-  
+
   core.info(writePath + fileName)
   fs.writeFileSync(writePath + fileName, JSON.stringify(content), 'utf-8');
 

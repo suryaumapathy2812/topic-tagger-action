@@ -23,11 +23,12 @@ jobs:
       
       - name: Checkout
         uses: actions/checkout@v3
-      
+        
       - uses: actions/download-artifact@v3
         with:
           name: latest-results
-          path: './records/'
+          path: '${{ github.workspace }}/records/'
+          allow-no-artifacts: true # Add this line
 
       - name: Topic Tagger
         id: topic-tagger
@@ -40,7 +41,8 @@ jobs:
       - uses: actions/upload-artifact@v3
         with:
           name: latest-results
-          path: '${{ github.workspace }}/*/latest-results.json'
+          path: '${{ github.workspace }}/output/topic_tagger_results.json'
           if-no-files-found: error
+
 
 ```
