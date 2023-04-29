@@ -32843,7 +32843,7 @@ function extractJsCode(file) {
 
 async function tagTopics(code) {
     try {
-        const concepts = (
+        const { concepts } = (
             await axios.post("https://core.api.learn2build.in/api/v4/javascript", {
                 body: {
                     "sourceLanguage": "JavaScript",
