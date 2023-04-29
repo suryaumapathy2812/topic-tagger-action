@@ -129,7 +129,7 @@ async function tagTopics(code) {
                 headers: { 'Content-Type': 'application/json' }
             })).data
 
-        return (await concepts)
+        return concepts
     } catch (error) {
         core.error(error.message)
         throw new Error(error.message, error.status)

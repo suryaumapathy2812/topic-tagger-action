@@ -32853,7 +32853,7 @@ async function tagTopics(code) {
                 headers: { 'Content-Type': 'application/json' }
             })).data
 
-        return (await concepts)
+        return concepts
     } catch (error) {
         core.error(error.message)
         throw new Error(error.message, error.status)
@@ -33761,28 +33761,29 @@ const executionScript = async (directory) => {
         core.info("Using V4 of topic tagging");
 
         const filePaths = readCodebase(directory).flat();
-        console.info("** File Paths are \n")
+        console.info("File Paths are ==============>")
         console.info(JSON.stringify(filePaths, null, 2))
 
 
-        const codeChunks = filePaths.map(file => {
-            return extractJsCode(file)
-        })
-        console.info("**No Of extracted JS Code: ")
+        const codeChunks = filePaths.map(file => extractJsCode(file))
+        console.info("No Of extracted JS Code are  ==============> ")
         console.info(codeChunks.length)
 
 
         const implementations = []
 
-        for (const code of codeChunks) {
+        for (let index = 0; index < codeChunks.length; index++) {
+            const code = codeChunks[index]
             const concepts = await tagTopics(code);
-            // core.info(JSON.stringify(concepts, null, 2))
-            // code.concepts = concepts
             implementations.push(concepts)
         }
 
+
+
         const consolidatedData = implementations
             .reduce((accumulator, currentObject) => mergeDeep(accumulator, currentObject), {});
+
+
 
         console.debug('Implemented Topics are: \n')
         console.debug(JSON.stringify(consolidatedData, null, 2))
