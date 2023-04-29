@@ -32826,8 +32826,6 @@ function extractJsFromHtml(filePath) {
 
 function extractJsCode(file) {
 
-    core.info(file);
-
     let code;
 
     if ((file.path).endsWith('.html')) {
@@ -32913,7 +32911,7 @@ const downloadArtifact = async () => {
 
         if (runs.workflow_runs.length === 0) {
             core.info("No successful workflow runs found");
-            return;
+            throw new Error("No successful workflow runs found")
         }
 
 
@@ -32929,7 +32927,7 @@ const downloadArtifact = async () => {
 
         if (!artifact) {
             core.info("Artifact not found");
-            return;
+            throw new Error("Artifact not found");
         }
 
         const downloadUrl = artifact.archive_download_url;
@@ -33764,13 +33762,13 @@ const executionScript = async (directory) => {
 
         const filePaths = readCodebase(directory).flat();
         console.info("** File Paths are \n")
-        console.info(filePaths.map(file => JSON.stringify(file)))
+        console.info(JSON.stringify(filePaths, null, 2))
 
 
         const codeChunks = filePaths.map(file => {
             return extractJsCode(file)
         })
-        console.info("**No Of extracted JS Code: \n")
+        console.info("**No Of extracted JS Code: ")
         console.info(codeChunks.length)
 
 
@@ -33778,7 +33776,7 @@ const executionScript = async (directory) => {
 
         for (const code of codeChunks) {
             const concepts = await tagTopics(code);
-            core.info(JSON.stringify(concepts, null, 2))
+            // core.info(JSON.stringify(concepts, null, 2))
             // code.concepts = concepts
             implementations.push(concepts)
         }
@@ -48107,27 +48105,29 @@ async function run() {
     }
 
 
-    core.debug(JSON.stringify(filePaths)); // debug is only output if you set the secret `ACTIONS_RUNNER_DEBUG` to true
     const newTopicOutput = filePaths
-    
     core.info('JavaScript topics used in the codebase:');
     core.info(JSON.stringify(newTopicOutput, null, 4));
+
+
 
     core.setOutput('tags', newTopicOutput);
     core.setOutput('tags_comment_id', commitId);
 
 
 
-
     const oldTopicOutput = await topicTagger.downloadArtifact()
     core.info(oldTopicOutput)
+
+
+
 
     const commentResult = await topicTagger.handleComment(newTopicOutput, oldTopicOutput)
       .catch((error) => {
         core.setFailed(error.message);
       });
-
     core.info(JSON.stringify(commentResult, null, 2))
+
 
 
     writeToFile(startPoint, newTopicOutput);

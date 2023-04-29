@@ -102,8 +102,6 @@ function extractJsFromHtml(filePath) {
 
 function extractJsCode(file) {
 
-    core.info(file);
-
     let code;
 
     if ((file.path).endsWith('.html')) {

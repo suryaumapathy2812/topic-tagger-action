@@ -35,13 +35,13 @@ const executionScript = async (directory) => {
 
         const filePaths = readCodebase(directory).flat();
         console.info("** File Paths are \n")
-        console.info(filePaths.map(file => JSON.stringify(file)))
+        console.info(JSON.stringify(filePaths, null, 2))
 
 
         const codeChunks = filePaths.map(file => {
             return extractJsCode(file)
         })
-        console.info("**No Of extracted JS Code: \n")
+        console.info("**No Of extracted JS Code: ")
         console.info(codeChunks.length)
 
 
@@ -49,7 +49,7 @@ const executionScript = async (directory) => {
 
         for (const code of codeChunks) {
             const concepts = await tagTopics(code);
-            core.info(JSON.stringify(concepts, null, 2))
+            // core.info(JSON.stringify(concepts, null, 2))
             // code.concepts = concepts
             implementations.push(concepts)
         }

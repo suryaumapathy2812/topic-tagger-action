@@ -36,27 +36,29 @@ async function run() {
     }
 
 
-    core.debug(JSON.stringify(filePaths)); // debug is only output if you set the secret `ACTIONS_RUNNER_DEBUG` to true
     const newTopicOutput = filePaths
-    
     core.info('JavaScript topics used in the codebase:');
     core.info(JSON.stringify(newTopicOutput, null, 4));
+
+
 
     core.setOutput('tags', newTopicOutput);
     core.setOutput('tags_comment_id', commitId);
 
 
 
-
     const oldTopicOutput = await topicTagger.downloadArtifact()
     core.info(oldTopicOutput)
+
+
+
 
     const commentResult = await topicTagger.handleComment(newTopicOutput, oldTopicOutput)
       .catch((error) => {
         core.setFailed(error.message);
       });
-
     core.info(JSON.stringify(commentResult, null, 2))
+
 
 
     writeToFile(startPoint, newTopicOutput);

@@ -41,7 +41,7 @@ const downloadArtifact = async () => {
 
         if (runs.workflow_runs.length === 0) {
             core.info("No successful workflow runs found");
-            return;
+            throw new Error("No successful workflow runs found")
         }
 
 
@@ -57,7 +57,7 @@ const downloadArtifact = async () => {
 
         if (!artifact) {
             core.info("Artifact not found");
-            return;
+            throw new Error("Artifact not found");
         }
 
         const downloadUrl = artifact.archive_download_url;
