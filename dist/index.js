@@ -32843,7 +32843,7 @@ function extractJsCode(file) {
 
 async function tagTopics(code) {
     try {
-        const { concepts } = (
+        const concepts = (
             await axios.post("https://core.api.learn2build.in/api/v4/javascript", {
                 body: {
                     "sourceLanguage": "JavaScript",
@@ -33777,7 +33777,6 @@ const executionScript = async (directory) => {
             const concepts = await tagTopics(code);
             implementations.push(concepts)
         }
-
 
 
         const consolidatedData = implementations
@@ -48095,16 +48094,14 @@ async function run() {
         filePaths = topicTagger.v2(startPoint);
         break;
       case "v3":
-        filePaths = topicTagger.v3(startPoint);
+        filePaths = await topicTagger.v3(startPoint);
         break;
       case "v4":
-        filePaths = topicTagger.v4(startPoint);
+        filePaths = await topicTagger.v4(startPoint);
         break;
       default:
         filePaths = await topicTagger.v4(startPoint);
-        break;
     }
-
 
     const newTopicOutput = filePaths
     core.info('JavaScript topics used in the codebase:');

@@ -25,16 +25,14 @@ async function run() {
         filePaths = topicTagger.v2(startPoint);
         break;
       case "v3":
-        filePaths = topicTagger.v3(startPoint);
+        filePaths = await topicTagger.v3(startPoint);
         break;
       case "v4":
-        filePaths = topicTagger.v4(startPoint);
+        filePaths = await topicTagger.v4(startPoint);
         break;
       default:
         filePaths = await topicTagger.v4(startPoint);
-        break;
     }
-
 
     const newTopicOutput = filePaths
     core.info('JavaScript topics used in the codebase:');

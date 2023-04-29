@@ -52,7 +52,6 @@ const executionScript = async (directory) => {
         }
 
 
-
         const consolidatedData = implementations
             .reduce((accumulator, currentObject) => mergeDeep(accumulator, currentObject), {});
 
