@@ -1,21 +1,27 @@
 const core = require('@actions/core');
 const github = require('@actions/github');
 
-const formatTable = (topicOutput) => {
+const formatTable = (oldTopicOutput, newTopicOutput) => {
     let tableRows = '';
-    for (const topic in topicOutput) {
-        for (const subtopic in topicOutput[topic]) {
-            const count = topicOutput[topic][subtopic];
-            tableRows += `| ${topic} | ${subtopic} | ${count} |\n`;
+    for (const topic in newTopicOutput) {
+        for (const subtopic in newTopicOutput[topic]) {
+            const oldCount = (oldTopicOutput[topic] && oldTopicOutput[topic][subtopic]) || 0;
+            const newCount = newTopicOutput[topic][subtopic];
+            const diffCount = newCount - oldCount;
+            const diffSign = diffCount >= 0 ? '+' : '';
+
+            tableRows += `| ${topic} | ${subtopic} | ${newCount} (${diffSign}${diffCount}) |\n`;
         }
     }
     return tableRows;
 };
 
-const handleComment = async (tags) => {
+
+const handleComment = async (newTopicOutput, oldTopicOutput) => {
     core.debug("Entering handleComment")
 
-    const tableData = formatTable(tags);
+    const tableData = formatTable(oldTopicOutput, newTopicOutput);
+
     core.info(JSON.stringify(tableData))
 
 
@@ -72,13 +78,13 @@ const handleComment = async (tags) => {
         });
         core.info('New comment created.');
     } else {
-        core.info('Updating Existing Comment')
+        core.info('Updating Existing Comment');
         result = await octokit.rest.issues.updateComment({
             owner,
             repo,
             // eslint-disable-next-line camelcase
             comment_id: generatedComment.id,
-            body: `<!-- GENERATED_TOPIC_TABLE -->\n\n**List of Implemented Topics:**\n\n| Topic          | Subtopic               | Count |\n|----------------|------------------------|-------|\n${tableData}`
+            body: `<!-- GENERATED_TOPIC_TABLE -->\n\n**List of Implemented Topics:**\n\n| Topic          | Subtopic               | Count (Difference) |\n|----------------|------------------------|--------------------|\n${tableData}`
         });
         core.info('Existing comment updated.');
     }

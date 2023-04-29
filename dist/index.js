@@ -37052,21 +37052,27 @@ function defaultCallback(err) {
 const core = __nccwpck_require__(2186);
 const github = __nccwpck_require__(5438);
 
-const formatTable = (topicOutput) => {
+const formatTable = (oldTopicOutput, newTopicOutput) => {
     let tableRows = '';
-    for (const topic in topicOutput) {
-        for (const subtopic in topicOutput[topic]) {
-            const count = topicOutput[topic][subtopic];
-            tableRows += `| ${topic} | ${subtopic} | ${count} |\n`;
+    for (const topic in newTopicOutput) {
+        for (const subtopic in newTopicOutput[topic]) {
+            const oldCount = (oldTopicOutput[topic] && oldTopicOutput[topic][subtopic]) || 0;
+            const newCount = newTopicOutput[topic][subtopic];
+            const diffCount = newCount - oldCount;
+            const diffSign = diffCount >= 0 ? '+' : '';
+
+            tableRows += `| ${topic} | ${subtopic} | ${newCount} (${diffSign}${diffCount}) |\n`;
         }
     }
     return tableRows;
 };
 
-const handleComment = async (tags) => {
+
+const handleComment = async (newTopicOutput, oldTopicOutput) => {
     core.debug("Entering handleComment")
 
-    const tableData = formatTable(tags);
+    const tableData = formatTable(oldTopicOutput, newTopicOutput);
+
     core.info(JSON.stringify(tableData))
 
 
@@ -37123,13 +37129,13 @@ const handleComment = async (tags) => {
         });
         core.info('New comment created.');
     } else {
-        core.info('Updating Existing Comment')
+        core.info('Updating Existing Comment');
         result = await octokit.rest.issues.updateComment({
             owner,
             repo,
             // eslint-disable-next-line camelcase
             comment_id: generatedComment.id,
-            body: `<!-- GENERATED_TOPIC_TABLE -->\n\n**List of Implemented Topics:**\n\n| Topic          | Subtopic               | Count |\n|----------------|------------------------|-------|\n${tableData}`
+            body: `<!-- GENERATED_TOPIC_TABLE -->\n\n**List of Implemented Topics:**\n\n| Topic          | Subtopic               | Count (Difference) |\n|----------------|------------------------|--------------------|\n${tableData}`
         });
         core.info('Existing comment updated.');
     }
@@ -37160,85 +37166,91 @@ const extract = __nccwpck_require__(460);
 const path = __nccwpck_require__(1017);
 
 const downloadArtifact = async () => {
-    core.debug("Entering downloadArtifact")
 
-    const token = core.getInput('github_token');
-    core.debug(token)
-    const artifactName = "latest-results";
+    try {
 
-    const octokit = github.getOctokit(token);
-    const context = github.context;
-    const fullName = context.payload.repository.full_name;
+        core.debug("Entering downloadArtifact")
 
-    const [owner, repo] = fullName.split("/");
+        const token = core.getInput('github_token');
+        core.debug(token)
+        const artifactName = "latest-results";
 
-    const absolutePath = path.resolve("./");
-    const outputPath = absolutePath + "/records"
+        const octokit = github.getOctokit(token);
+        const context = github.context;
+        const fullName = context.payload.repository.full_name;
 
-    const workflowPath = github.context.workflow.split("/")
-    const workflowIdOrFileName = workflowPath[workflowPath.length - 1];
-    core.info(workflowIdOrFileName)
+        const [owner, repo] = fullName.split("/");
 
-    const { data: runs } = await octokit.rest.actions.listWorkflowRuns({
-        owner,
-        repo,
-        // eslint-disable-next-line camelcase
-        workflow_id: workflowIdOrFileName,
-        status: "success",
-    });
+        const absolutePath = path.resolve("./");
+        const outputPath = absolutePath + "/records"
 
-    if (runs.workflow_runs.length === 0) {
-        core.info("No successful workflow runs found");
-        return;
+        const workflowPath = github.context.workflow.split("/")
+        const workflowIdOrFileName = workflowPath[workflowPath.length - 1];
+        core.info(workflowIdOrFileName)
+
+        const { data: runs } = await octokit.rest.actions.listWorkflowRuns({
+            owner,
+            repo,
+            // eslint-disable-next-line camelcase
+            workflow_id: workflowIdOrFileName,
+            status: "success",
+        });
+
+        if (runs.workflow_runs.length === 0) {
+            core.info("No successful workflow runs found");
+            return;
+        }
+
+
+        const runId = runs.workflow_runs[0].id;
+        const { data: artifacts } = await octokit.rest.actions.listWorkflowRunArtifacts({
+            owner,
+            repo,
+            // eslint-disable-next-line camelcase
+            run_id: runId,
+        });
+
+        const artifact = artifacts.artifacts.find((a) => a.name === artifactName);
+
+        if (!artifact) {
+            core.info("Artifact not found");
+            return;
+        }
+
+        const downloadUrl = artifact.archive_download_url;
+        const response = await fetch(downloadUrl, {
+            headers: { Authorization: `token ${token}` },
+        });
+
+        if (!response.ok) {
+            throw new Error(`Failed to download artifact: ${response.statusText}`);
+        }
+
+        await fs.promises.mkdir(outputPath, { recursive: true });
+        const zipPath = `${outputPath}/artifact.zip`;
+        await streamPipeline(response.body, fs.createWriteStream(zipPath));
+
+        core.info(`Artifact downloaded to ${zipPath}`);
+
+        // Extract the JSON file from the .zip artifact
+        await extract(zipPath, { dir: outputPath });
+        core.info(`Artifact extracted to ${outputPath}`);
+
+        // Delete the .zip file
+        fs.unlinkSync(zipPath);
+
+        const result = fs.readFileSync(outputPath + '/topic_tagger_results.json', 'utf-8')
+        core.info(" records ======================================== >")
+        core.info(result)
+        core.info(" records ======================================== >")
+
+        return result;
+
+    } catch (error) {
+        core.info(JSON.stringify(error, null, 2))
+        return {}
     }
 
-
-    const runId = runs.workflow_runs[0].id;
-    const { data: artifacts } = await octokit.rest.actions.listWorkflowRunArtifacts({
-        owner,
-        repo,
-        // eslint-disable-next-line camelcase
-        run_id: runId,
-    });
-
-    const artifact = artifacts.artifacts.find((a) => a.name === artifactName);
-
-    if (!artifact) {
-        core.info("Artifact not found");
-        return;
-    }
-
-    const downloadUrl = artifact.archive_download_url;
-    const response = await fetch(downloadUrl, {
-        headers: { Authorization: `token ${token}` },
-    });
-
-    if (!response.ok) {
-        throw new Error(`Failed to download artifact: ${response.statusText}`);
-    }
-
-    await fs.promises.mkdir(outputPath, { recursive: true });
-    const zipPath = `${outputPath}/artifact.zip`;
-    await streamPipeline(response.body, fs.createWriteStream(zipPath));
-
-    core.info(`Artifact downloaded to ${zipPath}`);
-
-    // Extract the JSON file from the .zip artifact
-    await extract(zipPath, { dir: outputPath });
-    core.info(`Artifact extracted to ${outputPath}`);
-
-
-    core.info(`Artifact extracted to ${fs.readdirSync(outputPath)}`);
-
-    // Delete the .zip file
-    fs.unlinkSync(zipPath);
-
-    const result = fs.readFileSync(outputPath + '/topic_tagger_results.json', 'utf-8')
-    core.info(" records ======================================== >")
-    core.info(result)
-    core.info(" records ======================================== >")
-
-    return result;
 };
 
 
@@ -48279,28 +48291,26 @@ async function run() {
 
     core.debug(JSON.stringify(filePaths)); // debug is only output if you set the secret `ACTIONS_RUNNER_DEBUG` to true
 
-    const tags = filePaths
+    const newTopicOutput = filePaths
 
     core.info('JavaScript topics used in the codebase:');
-    core.info(JSON.stringify(tags, null, 4));
+    core.info(JSON.stringify(newTopicOutput, null, 4));
 
-    core.setOutput('tags', tags);
+    core.setOutput('tags', newTopicOutput);
     core.setOutput('tags_comment_id', commitId);
 
-    const commentResult = await topicTagger.handleComment(tags)
+    const oldTopicOutput = await topicTagger.downloadArtifact()
+    core.info(oldTopicOutput)
+
+    const commentResult = await topicTagger.handleComment(newTopicOutput, oldTopicOutput)
       .catch((error) => {
         core.setFailed(error.message);
       });
 
     core.info(JSON.stringify(commentResult, null, 2))
 
-    const previousResult = await topicTagger.downloadArtifact()
-      .catch((error) => {
-        console.error(error);
-        process.exit(1);
-      });
-    core.info(previousResult)
-    writeToFile(startPoint, tags);
+
+    writeToFile(startPoint, newTopicOutput);
 
   } catch (error) {
     core.setFailed(error.message);
