@@ -5,7 +5,8 @@ const formatTable = (oldTopicOutput, newTopicOutput) => {
     let tableRows = '';
     for (const topic in newTopicOutput) {
         for (const subtopic in newTopicOutput[topic]) {
-            const oldCount = (oldTopicOutput[topic] && oldTopicOutput[topic][subtopic]) || 0;
+            core.info("oldTopicOutput[topic] =>>>>>>>>>>>>FFF  \n" + JSON.stringify(oldTopicOutput[topic], null, 2))
+            const oldCount = (oldTopicOutput[topic] && oldTopicOutput[topic][subtopic]) ? oldTopicOutput[topic][subtopic] : 0;
             const newCount = newTopicOutput[topic][subtopic];
             core.info("new count =>>>>>>>>>>" + newCount)
             core.info("old count =>>>>>>>>>>" + oldCount)
