@@ -158,42 +158,21 @@ const executionScript = async (directory) => {
                     return
                 }
 
-
-
-                // for (const chunk of codeChunks) {
-                //     const concept = await fetch("https://core.api.learn2build.in/api/v4/javascript", {
-                //         method: "POST",
-                //         body: {
-                //             "sourceLanguage": "JavaScript",
-                //             "targetLanguage": "JavaScript",
-                //             "code": chunk
-                //         }
-                //     })
-
-                //     return { chunk, concept }
-                // }
-
                 const analysisResults = await Promise
                     .all(
                         codeChunks.map(async (chunk) => {
                             const concepts = await fetch("https://core.api.learn2build.in/api/v4/javascript", {
                                 method: "POST",
-                                body: {
+                                body: JSON.stringify({
                                     "sourceLanguage": "JavaScript",
                                     "targetLanguage": "JavaScript",
                                     "code": chunk
-                                }
+                                }),
+                                headers: { 'Content-Type': 'application/json' }
                             })
                             return { chunk, concepts };
                         })
                     );
-
-
-                // const analysisResults = codeChunks.map((chunk) => {
-                //     const ast = generateAST(chunk);
-                //     const concepts = ast ? analyzeAST(ast, conceptPatterns) : [];
-                //     return { chunk, concepts };
-                // });
 
                 const temporary = analysisResults
                     .reduce((accumulator, currentObject) => mergeDeep(accumulator, currentObject), {});
