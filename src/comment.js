@@ -11,7 +11,7 @@ const formatTable = (oldTopicOutput, newTopicOutput) => {
             core.info("new count =>>>>>>>>>>" + newCount)
             core.info("old count =>>>>>>>>>>" + oldCount)
             const diffCount = newCount - oldCount;
-            const diffSign = diffCount > 0 ? `+ ${diffCount}` : `${diffCount}`;
+            const diffSign = diffCount > 0 ? `+ ${diffCount}` : (diffCount < 0 ? `${diffCount}` : `0`);
 
             tableRows += `| ${topic} | ${subtopic} | ${newCount} (${diffSign}${diffCount}) |\n`;
         }
