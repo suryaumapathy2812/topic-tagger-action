@@ -48,7 +48,7 @@ const executionScript = async (directory) => {
         const implementations = []
 
         for (const code of codeChunks) {
-            const concepts = tagTopics(code);
+            const concepts = await tagTopics(code);
             core.info(JSON.stringify(concepts, null, 2))
             // code.concepts = concepts
             implementations.push(concepts)

@@ -32732,6 +32732,7 @@ const { default: axios } = __nccwpck_require__(8757);
 //     return range1[0] < range2[1] && range1[1] > range2[0];
 // }
 
+
 // function isExtracted(range, extractedRanges) {
 //     for (const extractedRange of extractedRanges) {
 //         if (isOverlapping(range, extractedRange)) {
@@ -32740,6 +32741,33 @@ const { default: axios } = __nccwpck_require__(8757);
 //     }
 //     return false;
 // }
+
+
+// function extractCodeChunks(code) {
+
+//     let parsedCode;
+
+//     try {
+//         parsedCode = esprima.parseScript(code, { range: true, tokens: true, comment: true });
+//     } catch (error) {
+//         return false
+//     }
+
+//     const chunks = [];
+//     const extractedRanges = [];
+
+
+//     parsedCode.body.forEach((node) => {
+//         if (!isExtracted(node.range), extractedRanges) {
+//             const chunk = code.slice(node.range[0], node.range[1]);
+//             chunks.push(chunk);
+//             extractedRanges.push(node.range);
+//         }
+//     });
+
+//     return chunks;
+// }
+
 
 function readCodebase(directory) {
     const entries = fs.readdirSync(directory, { withFileTypes: true })
@@ -32814,30 +32842,6 @@ function extractJsCode(file) {
 
 }
 
-// function extractCodeChunks(code) {
-
-//     let parsedCode;
-
-//     try {
-//         parsedCode = esprima.parseScript(code, { range: true, tokens: true, comment: true });
-//     } catch (error) {
-//         return false
-//     }
-
-//     const chunks = [];
-//     const extractedRanges = [];
-
-
-//     parsedCode.body.forEach((node) => {
-//         if (!isExtracted(node.range), extractedRanges) {
-//             const chunk = code.slice(node.range[0], node.range[1]);
-//             chunks.push(chunk);
-//             extractedRanges.push(node.range);
-//         }
-//     });
-
-//     return chunks;
-// }
 
 async function tagTopics(code) {
     try {
@@ -33773,7 +33777,7 @@ const executionScript = async (directory) => {
         const implementations = []
 
         for (const code of codeChunks) {
-            const concepts = tagTopics(code);
+            const concepts = await tagTopics(code);
             core.info(JSON.stringify(concepts, null, 2))
             // code.concepts = concepts
             implementations.push(concepts)
