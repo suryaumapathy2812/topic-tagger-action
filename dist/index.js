@@ -32626,10 +32626,12 @@ const formatTable = (oldTopicOutput, newTopicOutput) => {
             core.info("oldTopicOutput[topic] =>>>>>>>>>>>>  \n" + JSON.stringify(oldTopicOutput[topic], null, 2))
             const oldCount = (oldTopicOutput[topic] && oldTopicOutput[topic][subtopic]) ? oldTopicOutput[topic][subtopic] : 0;
             const newCount = newTopicOutput[topic][subtopic];
-            core.info("new count =>>>>>>>>>>" + newCount)
-            core.info("old count =>>>>>>>>>>" + oldCount)
+            core.info("new count =>>>>>>>>>> " + newCount)
+            core.info("old count =>>>>>>>>>> " + oldCount)
             const diffCount = newCount - oldCount;
             const diffSign = diffCount > 0 ? `+ ${diffCount}` : (diffCount < 0 ? `${diffCount}` : `0`);
+
+            core.info(`diffcount =>>>>>>>>>> ${diffCount}`)
 
             tableRows += `| ${topic} | ${subtopic} | ${newCount} (${diffSign}${diffCount}) |\n`;
         }
