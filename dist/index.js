@@ -32625,6 +32625,8 @@ const formatTable = (oldTopicOutput, newTopicOutput) => {
         for (const subtopic in newTopicOutput[topic]) {
             const oldCount = (oldTopicOutput[topic] && oldTopicOutput[topic][subtopic]) || 0;
             const newCount = newTopicOutput[topic][subtopic];
+            core.info("new count =>>>>>>>>>>" + newCount)
+            core.info("old count =>>>>>>>>>>" + oldCount)
             const diffCount = newCount - oldCount;
             const diffSign = diffCount >= 0 ? '+' : '';
 
