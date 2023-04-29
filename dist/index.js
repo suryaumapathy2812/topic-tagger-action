@@ -40288,6 +40288,7 @@ module.exports = executeScript
 /***/ 5787:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
+const core = __nccwpck_require__(2186)
 const esprima = __nccwpck_require__(8823); // If using Node.js and npm
 const fs = __nccwpck_require__(7147);
 const cheerio = __nccwpck_require__(4612);
@@ -40415,7 +40416,7 @@ function extractJsFromHtml(filePath) {
 const executionScript = async (directory) => {
     try {
 
-        console.log("Using V4 of topic tagging");
+        core.info("Using V4 of topic tagging");
 
         const filePaths = readCodebase(directory).flat();
 
@@ -40426,59 +40427,58 @@ const executionScript = async (directory) => {
 
         const implementations = []
 
-        filePaths
-            .forEach(async file => {
+        for (const file of filePaths) {
 
-                console.log(file)
-                let code = ''
+            core.info(file)
+            let code = ''
 
-                if ((file.path).endsWith('.html')) {
-                    code = extractJsFromHtml(file).join(" \n\n ");
-                    // console.debug(`JavaScript code in ${file}:\n`, JSON.stringify(code, null, 2));
-                } else if ((file.path).endsWith('.js')) {
-                    const _code = fs.readFileSync(file.path, 'utf8');
-                    code = _code;
-                }
+            if ((file.path).endsWith('.html')) {
+                code = extractJsFromHtml(file).join(" \n\n ");
+                // console.debug(`JavaScript code in ${file}:\n`, JSON.stringify(code, null, 2));
+            } else if ((file.path).endsWith('.js')) {
+                const _code = fs.readFileSync(file.path, 'utf8');
+                code = _code;
+            }
 
-                const codeChunks = extractCodeChunks(code);
+            const codeChunks = extractCodeChunks(code);
 
-                if (codeChunks === false) {
-                    console.debug(`Skipping file due to error`);
-                    index++
-                    return
-                }
+            if (codeChunks === false) {
+                console.debug(`Skipping file due to error`);
+                index++
+                return
+            }
 
-                const response = []
-                for (const chunk of codeChunks) {
-                    const result = { chunk };
-                    const concepts = await axios.post("https://core.api.learn2build.in/api/v4/javascript", {
+            const response = []
+            for (const chunk of codeChunks) {
+                const result = { chunk, concepts: {} };
+                const { concepts } = (
+                    await axios.post("https://core.api.learn2build.in/api/v4/javascript", {
                         body: {
                             "sourceLanguage": "JavaScript",
                             "targetLanguage": "JavaScript",
                             "code": chunk
                         },
                         headers: { 'Content-Type': 'application/json' }
-                    })
-                    result["concepts"] = concepts.data
-                    response.push(result);
-                }
+                    })).data
+                result.concepts = concepts
+                response.push(result);
+            }
 
-                const analysisResults = await Promise
-                    .all(response);
+            const analysisResults = await Promise
+                .all(response);
 
-                console.log(JSON.stringify(analysisResults, null, 2))
+            core.info(JSON.stringify(analysisResults, null, 2))
 
+            const temporary = analysisResults
+                .reduce((accumulator, currentObject) => mergeDeep(accumulator, currentObject), {});
 
-                const temporary = analysisResults
-                    .reduce((accumulator, currentObject) => mergeDeep(accumulator, currentObject), {});
+            core.info(temporary)
 
-                console.log(temporary)
-
-                const finalResult = temporary.concepts;
-                filePaths[index]["topics"] = finalResult
-                index++
-                implementations.push(finalResult);
-            })
+            const finalResult = temporary.concepts;
+            filePaths[index]["topics"] = finalResult
+            index++
+            implementations.push(finalResult);
+        }
 
         const consolidatedData = implementations
             .reduce((accumulator, currentObject) => mergeDeep(accumulator, currentObject), {});
@@ -54805,14 +54805,16 @@ async function run() {
 
 
     core.debug(JSON.stringify(filePaths)); // debug is only output if you set the secret `ACTIONS_RUNNER_DEBUG` to true
-
     const newTopicOutput = filePaths
-
+    
     core.info('JavaScript topics used in the codebase:');
     core.info(JSON.stringify(newTopicOutput, null, 4));
 
     core.setOutput('tags', newTopicOutput);
     core.setOutput('tags_comment_id', commitId);
+
+
+
 
     const oldTopicOutput = await topicTagger.downloadArtifact()
     core.info(oldTopicOutput)
