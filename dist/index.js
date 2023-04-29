@@ -37233,7 +37233,7 @@ const downloadArtifact = async () => {
     // Delete the .zip file
     fs.unlinkSync(zipPath);
 
-    const result = fs.readFileSync(outputPath + '/latest-results.json', 'utf-8')
+    const result = fs.readFileSync(outputPath + '/topic_tagger_results.json', 'utf-8')
     core.info(" records ======================================== >")
     core.info(result)
     core.info(" records ======================================== >")
