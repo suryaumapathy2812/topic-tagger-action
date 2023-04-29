@@ -37227,6 +37227,9 @@ const downloadArtifact = async () => {
     await extract(zipPath, { dir: outputPath });
     core.info(`Artifact extracted to ${outputPath}`);
 
+
+    core.info(`Artifact extracted to ${fs.readdirSync(outputPath)}`);
+
     // Delete the .zip file
     fs.unlinkSync(zipPath);
 
