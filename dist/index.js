@@ -38189,7 +38189,7 @@ const executionScript = async (directory) => {
                 const analysisResults = await Promise
                     .all(response);
 
-                console.log(analysisResults)
+                console.log(JSON.stringify(analysisResults, null, 2))
 
 
                 const temporary = analysisResults
