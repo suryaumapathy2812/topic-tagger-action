@@ -1,7 +1,7 @@
 const esprima = require('esprima'); // If using Node.js and npm
 const fs = require('fs');
 const cheerio = require("cheerio");
-const { default: fetch } = require('node-fetch');
+const { default: axios } = require('axios');
 
 function extractCodeChunks(code) {
 
@@ -158,19 +158,20 @@ const executionScript = async (directory) => {
                     return
                 }
 
-                const response = codeChunks
-                    .map(async (chunk) => {
-                        const concepts = await fetch("https://core.api.learn2build.in/api/v4/javascript", {
-                            method: "POST",
-                            body: JSON.stringify({
-                                "sourceLanguage": "JavaScript",
-                                "targetLanguage": "JavaScript",
-                                "code": chunk
-                            }),
-                            headers: { 'Content-Type': 'application/json' }
-                        })
-                        return { chunk, concepts };
+                const response = []
+                for (const chunk of codeChunks) {
+                    const result = { chunk };
+                    const concepts = await axios.post("https://core.api.learn2build.in/api/v4/javascript", {
+                        body: JSON.stringify({
+                            "sourceLanguage": "JavaScript",
+                            "targetLanguage": "JavaScript",
+                            "code": chunk
+                        }),
+                        headers: { 'Content-Type': 'application/json' }
                     })
+                    result["concepts"] = concepts.data
+                    response.push(result);
+                }
 
                 const analysisResults = await Promise
                     .all(response);
