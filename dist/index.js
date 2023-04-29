@@ -32623,7 +32623,7 @@ const formatTable = (oldTopicOutput, newTopicOutput) => {
     let tableRows = '';
     for (const topic in newTopicOutput) {
         for (const subtopic in newTopicOutput[topic]) {
-            core.info("oldTopicOutput[topic] =>>>>>>>>>>>>FFF  \n" + JSON.stringify(oldTopicOutput[topic], null, 2))
+            core.info("oldTopicOutput[topic] =>>>>>>>>>>>>  \n" + JSON.stringify(oldTopicOutput[topic], null, 2))
             const oldCount = (oldTopicOutput[topic] && oldTopicOutput[topic][subtopic]) ? oldTopicOutput[topic][subtopic] : 0;
             const newCount = newTopicOutput[topic][subtopic];
             core.info("new count =>>>>>>>>>>" + newCount)
@@ -32960,7 +32960,7 @@ const downloadArtifact = async () => {
         core.info(result)
         core.info(" records ======================================== >")
 
-        return result;
+        return JSON.parse(result);
 
     } catch (error) {
         core.info(JSON.stringify(error, null, 2))

@@ -87,7 +87,7 @@ const downloadArtifact = async () => {
         core.info(result)
         core.info(" records ======================================== >")
 
-        return result;
+        return JSON.parse(result);
 
     } catch (error) {
         core.info(JSON.stringify(error, null, 2))
