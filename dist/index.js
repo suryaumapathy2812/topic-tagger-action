@@ -40452,11 +40452,11 @@ const executionScript = async (directory) => {
                 for (const chunk of codeChunks) {
                     const result = { chunk };
                     const concepts = await axios.post("https://core.api.learn2build.in/api/v4/javascript", {
-                        body: JSON.stringify({
+                        body: {
                             "sourceLanguage": "JavaScript",
                             "targetLanguage": "JavaScript",
                             "code": chunk
-                        }),
+                        },
                         headers: { 'Content-Type': 'application/json' }
                     })
                     result["concepts"] = concepts.data
