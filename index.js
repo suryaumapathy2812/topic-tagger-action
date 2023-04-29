@@ -31,7 +31,7 @@ async function run() {
         filePaths = topicTagger.v4(startPoint);
         break;
       default:
-        filePaths = topicTagger.v4(startPoint);
+        filePaths = await topicTagger.v4(startPoint);
         break;
     }
 

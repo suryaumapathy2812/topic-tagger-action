@@ -158,24 +158,30 @@ const executionScript = async (directory) => {
                     return
                 }
 
-                const analysisResults = await Promise
-                    .all(
-                        codeChunks.map(async (chunk) => {
-                            const concepts = await fetch("https://core.api.learn2build.in/api/v4/javascript", {
-                                method: "POST",
-                                body: JSON.stringify({
-                                    "sourceLanguage": "JavaScript",
-                                    "targetLanguage": "JavaScript",
-                                    "code": chunk
-                                }),
-                                headers: { 'Content-Type': 'application/json' }
-                            })
-                            return { chunk, concepts };
+                const response = codeChunks
+                    .map(async (chunk) => {
+                        const concepts = await fetch("https://core.api.learn2build.in/api/v4/javascript", {
+                            method: "POST",
+                            body: JSON.stringify({
+                                "sourceLanguage": "JavaScript",
+                                "targetLanguage": "JavaScript",
+                                "code": chunk
+                            }),
+                            headers: { 'Content-Type': 'application/json' }
                         })
-                    );
+                        return { chunk, concepts };
+                    })
+
+                const analysisResults = await Promise
+                    .all(response);
+
+                console.log(analysisResults)
+
 
                 const temporary = analysisResults
                     .reduce((accumulator, currentObject) => mergeDeep(accumulator, currentObject), {});
+
+                console.log(temporary)
 
                 const finalResult = temporary.concepts;
                 filePaths[index]["topics"] = finalResult
